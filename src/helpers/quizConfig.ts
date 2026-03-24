@@ -9,7 +9,7 @@ export const assetUrl = (path: string) =>
  * Тайминги викторины — правь здесь:
  * - getGuessSeconds(revealLineCount) — 1 строка ответа=30с, 2=45с, 3+=60с
  * - STOP_SAFETY_MARGIN_SEC — запас до `end`, чтобы не проскочить конец (сек)
- * - TRANSITION_FADE_MS — затухание звука при смене раунда (мс)
+ * - TRANSITION_FADE_MS — затухание в конце раунда; нарастание за ту же длительность на отрезке ДО start (мс)
  * - INTRO_VIDEO_SECONDS — сколько секунд показывать стартовое видео
  *
  * Тайминги фрагментов трека (start / end секунд) — в файле `rounds.ts` у каждого раунда.

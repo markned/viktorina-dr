@@ -78,3 +78,39 @@ export const fadeOutVolume = (
     }
   };
 };
+
+export const fadeInVolume = (
+  setVolume: (value: number) => void,
+  durationMs: number,
+  onDone?: () => void,
+): (() => void) => {
+  const startAt = nowMs();
+  let rafId: number | null = null;
+  let stopped = false;
+
+  const animate = () => {
+    if (stopped) {
+      return;
+    }
+
+    const elapsed = nowMs() - startAt;
+    const progress = Math.min(1, elapsed / durationMs);
+    setVolume(progress);
+
+    if (progress >= 1) {
+      onDone?.();
+      return;
+    }
+
+    rafId = requestAnimationFrame(animate);
+  };
+
+  rafId = requestAnimationFrame(animate);
+
+  return () => {
+    stopped = true;
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+    }
+  };
+};

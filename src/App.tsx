@@ -4,9 +4,10 @@ import { LocalMediaPlayer } from "./adapters/localMediaPlayer";
 import type { PlayerAdapter } from "./adapters/player";
 import { IntroScreen } from "./components/IntroScreen";
 import { OutroScreen } from "./components/OutroScreen";
-import { RulesScreen } from "./components/RulesScreen";
 import { QuizBackground } from "./components/QuizBackground";
 import { QuizScreen } from "./components/QuizScreen";
+import { RestartConfirmDialog } from "./components/RestartConfirmDialog";
+import { RulesScreen } from "./components/RulesScreen";
 import { StartScreen } from "./components/StartScreen";
 import { TransitionOverlay } from "./components/TransitionOverlay";
 import { pickLyricLines } from "./helpers/lyrics";
@@ -20,12 +21,17 @@ import {
   TRANSITION_FADE_MS,
 } from "./helpers/quizConfig";
 import {
+  preRollSeekAndFadeInMs,
+  transitionOverlayTitle,
+  visibleHintCountAtTime,
+} from "./helpers/quizPlayback";
+import { createAccurateCountdown, fadeInVolume, fadeOutVolume } from "./helpers/timing";
+import {
   playTimerEndSound,
   playTimerTickSound,
   setTimerSoundsDucked,
   stopAllTimerCountSounds,
 } from "./lib/timerSounds";
-import { createAccurateCountdown, fadeOutVolume } from "./helpers/timing";
 import type { RoundState } from "./types";
 
 const createPlayer = (): PlayerAdapter => new LocalMediaPlayer();
@@ -102,6 +108,17 @@ export default function App() {
     fadeCancelRef.current = null;
   };
 
+  const stopPlaybackTimersAndFade = () => {
+    stopPlaybackMonitor();
+    stopCountdown();
+    stopFade();
+  };
+
+  const unmutePlayer = (player: PlayerAdapter) => {
+    stopFade();
+    player.setVolume(1);
+  };
+
   const ensurePlayer = () => {
     if (!playerRef.current) {
       playerRef.current = createPlayer();
@@ -116,15 +133,11 @@ export default function App() {
   ) => {
     stopPlaybackMonitor();
     const player = ensurePlayer();
-    const fragmentDuration = activeRound.end - activeRound.start;
-    const lineInterval = hintLineCount > 0 ? fragmentDuration / hintLineCount : fragmentDuration;
 
     const monitor = () => {
       const time = player.getCurrentTime();
-      const elapsed = time - activeRound.start;
-
-      const targetLines = lineInterval > 0 ? Math.min(hintLineCount, Math.floor(elapsed / lineInterval) + 1) : hintLineCount;
-      setVisibleHintLineCount((prev) => Math.max(prev, Math.min(targetLines, hintLineCount)));
+      const targetLines = visibleHintCountAtTime(time, activeRound, hintLineCount);
+      setVisibleHintLineCount((prev) => Math.max(prev, targetLines));
 
       if (time >= activeRound.end - STOP_SAFETY_MARGIN_SEC) {
         setVisibleHintLineCount(hintLineCount);
@@ -173,7 +186,6 @@ export default function App() {
     startPlaybackMonitorForRound(round, hintLines.length, preserveGuessTimer);
   };
 
-  /** Загрузка раунда по индексу — без устаревших замыканий. */
   const loadRoundAtIndex = async (index: number) => {
     const r = orderedRoundsRef.current[index];
     if (!r) {
@@ -181,27 +193,32 @@ export default function App() {
       return;
     }
     const hints = pickLyricLines(r.lyrics, r.hintLineIds);
-    stopPlaybackMonitor();
-    stopCountdown();
-    stopFade();
+    stopPlaybackTimersAndFade();
     setTimerSeconds(getGuessSeconds(r.revealLineIds.length));
     setVisibleHintLineCount(0);
     setRoundState("playing");
 
     const player = ensurePlayer();
-    player.setVolume(1);
     await player.load(toLocalMediaUrl(r));
-    player.seekTo(r.start);
+    const { preRollStartSec, fadeInMs } = preRollSeekAndFadeInMs(r.start, TRANSITION_FADE_MS);
+
+    player.seekTo(preRollStartSec);
+    player.setVolume(0);
     player.play();
     setIsPlaying(true);
+    if (fadeInMs <= 0) {
+      player.setVolume(1);
+    } else {
+      fadeCancelRef.current = fadeInVolume(player.setVolume.bind(player), fadeInMs, () => {
+        fadeCancelRef.current = null;
+      });
+    }
     startPlaybackMonitorForRound(r, hints.length, false);
   };
 
   useEffect(() => {
     return () => {
-      stopPlaybackMonitor();
-      stopCountdown();
-      stopFade();
+      stopPlaybackTimersAndFade();
       playerRef.current?.destroy?.();
     };
   }, []);
@@ -220,11 +237,13 @@ export default function App() {
     }
     const player = ensurePlayer();
     if (isPlaying) {
+      stopFade();
       player.pause();
       setIsPlaying(false);
       stopPlaybackMonitor();
       return;
     }
+    unmutePlayer(player);
     player.play();
     setIsPlaying(true);
     if (roundState === "playing") {
@@ -237,6 +256,7 @@ export default function App() {
       return;
     }
     const player = ensurePlayer();
+    unmutePlayer(player);
     player.seekTo(round.start);
     player.play();
     setIsPlaying(true);
@@ -261,6 +281,7 @@ export default function App() {
       return;
     }
     const player = ensurePlayer();
+    unmutePlayer(player);
     player.seekTo(pausedAtRef.current);
     player.play();
     setRoundState("reveal");
@@ -271,13 +292,12 @@ export default function App() {
     if (roundState === "reveal" || roundState === "transition" || roundState === "finished") {
       return;
     }
-    stopPlaybackMonitor();
-    stopCountdown();
-    stopFade();
+    stopPlaybackTimersAndFade();
     const player = ensurePlayer();
     if (!round) return;
     const answerStart = round.end - STOP_SAFETY_MARGIN_SEC;
     pausedAtRef.current = answerStart;
+    unmutePlayer(player);
     player.seekTo(answerStart);
     player.play();
     setRoundState("reveal");
@@ -301,18 +321,13 @@ export default function App() {
   };
 
   const beginRoundTransition = () => {
-    const next = roundIndexRef.current + 1;
     const list = orderedRoundsRef.current;
-    if (next < list.length) {
-      setUpcomingRoundTitle(list[next].title);
-    } else {
-      setUpcomingRoundTitle("Спасибо!");
-    }
+    const nextIdx = roundIndexRef.current + 1;
+    setUpcomingRoundTitle(transitionOverlayTitle(nextIdx, list));
+
     const player = ensurePlayer();
     setRoundState("transition");
-    stopPlaybackMonitor();
-    stopCountdown();
-    stopFade();
+    stopPlaybackTimersAndFade();
 
     fadeCancelRef.current = fadeOutVolume(player.setVolume.bind(player), TRANSITION_FADE_MS, () => {
       player.pause();
@@ -320,8 +335,8 @@ export default function App() {
       setIsPlaying(false);
       const current = roundIndexRef.current;
       const next = current + 1;
-      const list = orderedRoundsRef.current;
-      if (next >= list.length) {
+      const roundsList = orderedRoundsRef.current;
+      if (next >= roundsList.length) {
         setRoundState("finished");
         return;
       }
@@ -340,7 +355,8 @@ export default function App() {
   };
 
   const skipRulesAndStart = () => {
-    setUpcomingRoundTitle(orderedRoundsRef.current[0]?.title ?? "");
+    const list = orderedRoundsRef.current;
+    setUpcomingRoundTitle(list[0]?.title ?? "");
     setRoundState("transition");
     setTimeout(() => void loadRoundAtIndex(0), ROUND_DELAY_MS);
   };
@@ -348,14 +364,11 @@ export default function App() {
   const nextRound = () => {
     if (roundState === "reveal") {
       beginRoundTransition();
-      return;
     }
   };
 
   const restartQuiz = () => {
-    stopPlaybackMonitor();
-    stopCountdown();
-    stopFade();
+    stopPlaybackTimersAndFade();
     playerRef.current?.pause();
     playerRef.current?.setVolume(1);
     setRoundIndex(0);
@@ -410,28 +423,14 @@ export default function App() {
           onRestartRequest={() => setShowRestartConfirm(true)}
         />
       </div>
-      {showRestartConfirm ? (
-        <div className="confirm-backdrop" role="dialog" aria-modal="true">
-          <div className="confirm-dialog">
-            <h4>Перезапустить викторину?</h4>
-            <p>Текущий прогресс по раундам будет сброшен.</p>
-            <div className="confirm-actions">
-              <button className="btn" onClick={() => setShowRestartConfirm(false)}>
-                Отмена
-              </button>
-              <button
-                className="btn btn-danger"
-                onClick={() => {
-                  setShowRestartConfirm(false);
-                  restartQuiz();
-                }}
-              >
-                Заново
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <RestartConfirmDialog
+        open={showRestartConfirm}
+        onCancel={() => setShowRestartConfirm(false)}
+        onConfirm={() => {
+          setShowRestartConfirm(false);
+          restartQuiz();
+        }}
+      />
       <TransitionOverlay visible={roundState === "transition"} nextRoundTitle={upcomingRoundTitle} />
     </main>
   );
