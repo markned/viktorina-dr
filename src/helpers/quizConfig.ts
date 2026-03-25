@@ -1,4 +1,4 @@
-/** Базовый URL для статики (на GitHub Pages: /viktorina-dr/) */
+/** Базовый URL для статики (на GitHub Pages: /technique_quiz/) */
 const BASE = import.meta.env.BASE_URL ?? "/";
 
 /** Путь к файлу с учётом base (работает на GitHub Pages) */
