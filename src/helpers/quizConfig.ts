@@ -1,3 +1,9 @@
+/**
+ * Сколько раундов играть за одну сессию (из пула не скрытых в `rounds.ts`).
+ * Заглушка до UI выбора длины (например 10 / 25 / 50).
+ */
+export const DEFAULT_QUIZ_SESSION_LENGTH = 14;
+
 /** Базовый URL для статики (на GitHub Pages: /technique_quiz/) */
 const BASE = `${(import.meta.env.BASE_URL ?? "/").replace(/\/?$/, "/")}`;
 
@@ -12,7 +18,7 @@ export const assetUrl = (path: string) =>
  * - TRANSITION_FADE_MS — затухание в конце раунда; нарастание за ту же длительность на отрезке ДО start (мс)
  * - INTRO_VIDEO_SECONDS — сколько секунд показывать стартовое видео
  *
- * Тайминги фрагментов трека (start / end секунд) — в файле `rounds.ts` у каждого раунда.
+ * Тайминги фрагментов трека (start / end секунд) — в `src/content/rounds/rounds.ts` у каждого раунда.
  */
 export const getGuessSeconds = (revealLineCount: number): number =>
   revealLineCount <= 1 ? 30 : revealLineCount === 2 ? 45 : 60;
@@ -31,23 +37,3 @@ export const RULES_AUDIO_PATH = assetUrl("/content/audio/rules.mp3");
 export const RULES_AUDIO_DELAY_MS = 2000;
 export const INTRO_VIDEO_PATH = assetUrl("/content/video/intro.mp4");
 export const OUTRO_VIDEO_PATH = assetUrl("/content/video/outro.mp4");
-
-export const SPECIAL_BG_BY_TITLE: Record<string, { url: string; start: number }> = {
-  "Не прут колеса": { url: "https://youtu.be/NOuIXUmFc3g", start: 81 },
-  "За кем стоит Андерграунд": { url: "https://youtu.be/1hnqwsui5HE", start: 30 },
-};
-
-export const LOCAL_FILE_BY_TITLE: Record<string, string> = {
-  "Черная дыра": "Черная дыра.mp3",
-  "В аквапарке": "В аквапарке.mp3",
-  "Ебу закон": "Ебу закон.mp3",
-  "Море или океан": "Море или океан.mp3",
-  Гитлер: "Гитлер.mp3",
-  "Это жизнь": "Это жизнь.mp3",
-  "Не прут колеса": "Не прут колеса.mp3",
-  "За кем стоит Андерграунд": "За кем стоит Андерграунд.mp3",
-  Заебись: "Заебись.mp3",
-  Блевбургер: "Блевбургер.mp3",
-  "Короткая песенка": "Короткая песенка.mp3",
-  Демоны: "Демоны.mp3",
-};

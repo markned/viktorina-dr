@@ -3,10 +3,24 @@ export type LyricLine = {
   text: string;
 };
 
+/** Опциональный фон YouTube за слоями викторины */
+export type RoundBackgroundYoutube = {
+  url: string;
+  /** Секунда старта воспроизведения в embed */
+  start: number;
+};
+
+/**
+ * Один раунд викторины: название, текст, файл аудио, опциональный фон и тайминг фрагмента.
+ */
 export type Round = {
   id: number;
   title: string;
-  url: string;
+  /** Имя файла в `public/content/audio/music/` */
+  audioFile: string;
+  /** Не участвует в игре (только редактор / экспорт) */
+  hidden?: boolean;
+  backgroundYoutube?: RoundBackgroundYoutube;
   start: number;
   end: number;
   lyrics: LyricLine[];
@@ -23,5 +37,3 @@ export type RoundState =
   | "reveal"
   | "transition"
   | "finished";
-
-export type PlaybackMode = "local" | "youtube";

@@ -1,5 +1,5 @@
 import type { Round } from "../types";
-import { reorderNoConsecutiveSameTitle, shuffle } from "./media";
+import { reorderNoConsecutiveSameTitle, shuffle } from "./shuffle";
 
 /**
  * Раунды идут по возрастанию «сложности» (число строк в ответе: 1, затем 2, затем 3…),

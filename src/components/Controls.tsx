@@ -1,7 +1,23 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { ReplayWithPlayIcon } from "./ReplayWithPlayIcon";
+import { useCoarsePointer } from "../hooks/useCoarsePointer";
 import { useDockFitScale } from "../hooks/useDockFitScale";
+import { useGesturePauseLayout } from "../hooks/useGesturePauseLayout";
 import type { RoundState } from "../types";
+
+function usePauseHintText(): string {
+  const coarse = useCoarsePointer();
+  const gesturePause = useGesturePauseLayout();
+  return useMemo(() => {
+    if (!gesturePause) {
+      return "Пауза — кнопка в углу или клавиша Esc";
+    }
+    if (coarse) {
+      return "Пауза — коснитесь экрана двумя пальцами";
+    }
+    return "Пауза — клавиша Esc";
+  }, [gesturePause, coarse]);
+}
 
 type ControlsProps = {
   roundState: RoundState;
@@ -18,6 +34,7 @@ export function Controls({
 }: ControlsProps) {
   const dockRef = useRef<HTMLElement>(null);
   useDockFitScale(dockRef);
+  const pauseHint = usePauseHintText();
 
   const canReveal = roundState === "timer_finished";
   const canNext = roundState === "reveal";
@@ -25,6 +42,7 @@ export function Controls({
 
   return (
     <div className="dock-host">
+      <p className="dock-pause-hint">{pauseHint}</p>
       <nav ref={dockRef} className="dock" role="toolbar">
       <button
         type="button"

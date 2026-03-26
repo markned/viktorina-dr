@@ -43,7 +43,6 @@ type QuizBackgroundProps = {
 export function QuizBackground({ photoUrl, youtubeSrc }: QuizBackgroundProps) {
   const useYoutube = !!youtubeSrc;
   const photo = useDualCrossfade(photoUrl);
-  const yt = useDualCrossfade(youtubeSrc);
 
   const t = `${BACKGROUND_CROSSFADE_MS}ms`;
   const ease = "ease-in-out";
@@ -80,48 +79,27 @@ export function QuizBackground({ photoUrl, youtubeSrc }: QuizBackgroundProps) {
       <div
         className="quiz-bg-surface quiz-bg-surface-youtube"
         style={{
-          opacity: useYoutube ? 0.48 : 0,
+          opacity: useYoutube ? 1 : 0,
           transition: `opacity ${t} ${ease}`,
         }}
       >
-        <div className="youtube-bg-dual">
-          {yt.a ? (
-            <div
-              className="youtube-bg-wrap youtube-bg-wrap-layer"
-              style={{
-                opacity: yt.showA ? 1 : 0,
-                transition: `opacity ${t} ${ease}`,
-              }}
-            >
+        {youtubeSrc ? (
+          <div className="youtube-bg-dual">
+            <div className="youtube-bg-wrap youtube-bg-wrap-layer">
               <iframe
-                key={yt.a}
+                key={youtubeSrc}
                 className="youtube-bg"
-                src={yt.a}
+                src={youtubeSrc}
                 title="Фоновое видео YouTube"
-                allow="autoplay; encrypted-media; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                allowFullScreen
+                loading="eager"
                 referrerPolicy="strict-origin-when-cross-origin"
               />
             </div>
-          ) : null}
-          {yt.b ? (
-            <div
-              className="youtube-bg-wrap youtube-bg-wrap-layer"
-              style={{
-                opacity: yt.showA ? 0 : 1,
-                transition: `opacity ${t} ${ease}`,
-              }}
-            >
-              <iframe
-                key={yt.b}
-                className="youtube-bg"
-                src={yt.b}
-                title="Фоновое видео YouTube"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
-            </div>
-          ) : null}
-        </div>
+            <div className="youtube-bg-dim-scrim" aria-hidden />
+          </div>
+        ) : null}
       </div>
     </div>
   );

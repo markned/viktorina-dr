@@ -3,3 +3,11 @@ dist
 *.local
 .DS_Store
 *.tsbuildinfo
+
+# Локальные черновики редактора (экспорты, загрузки) — не коммитить
+editor-local/
+
+# Случайный emit tsc рядом с конфигом Vite (используем только .ts)
+vite.config.js
+vite/**/*.js
+vite/**/*.d.ts

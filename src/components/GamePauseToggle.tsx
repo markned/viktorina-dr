@@ -8,6 +8,7 @@ type GamePauseToggleProps = {
   touchMode: boolean;
   onRestartRequest: () => void;
   onExitToStart: () => void;
+  onRulesRequest: () => void;
 };
 
 export function GamePauseToggle({
@@ -17,6 +18,7 @@ export function GamePauseToggle({
   touchMode,
   onRestartRequest,
   onExitToStart,
+  onRulesRequest,
 }: GamePauseToggleProps) {
   return (
     <>
@@ -26,7 +28,7 @@ export function GamePauseToggle({
           <div className="game-pause-icon-stage">
             <div className="game-pause-start-icon-wrap" aria-hidden>
               <img
-                src={assetUrl("/content/photos/start-icon.png")}
+                src={assetUrl("/content/icons/pause-icon.png")}
                 alt=""
                 className="start-icon"
                 draggable={false}
@@ -35,16 +37,19 @@ export function GamePauseToggle({
             <div className="game-pause-menu">
               <button
                 type="button"
-                className="game-pause-menu-btn"
-                onClick={onRestartRequest}
+                className="game-pause-menu-btn game-pause-menu-btn--accent"
+                onClick={onRulesRequest}
               >
-                Перезапуск
+                Правила
               </button>
               <button
                 type="button"
                 className="game-pause-menu-btn game-pause-menu-btn--secondary"
-                onClick={onExitToStart}
+                onClick={onRestartRequest}
               >
+                Перезапуск
+              </button>
+              <button type="button" className="game-pause-menu-btn" onClick={onExitToStart}>
                 Выйти
               </button>
             </div>
