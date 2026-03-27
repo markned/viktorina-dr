@@ -4,7 +4,7 @@
  */
 export const DEFAULT_QUIZ_SESSION_LENGTH = 14;
 
-/** Базовый URL для статики (на GitHub Pages: /technique_quiz/) */
+/** Базовый URL статики (`import.meta.env.BASE_URL` из Vite). */
 const BASE = `${(import.meta.env.BASE_URL ?? "/").replace(/\/?$/, "/")}`;
 
 /** Путь к файлу с учётом base (работает на GitHub Pages) */

@@ -164,7 +164,7 @@ export function navigateToQuizPreview(): void {
   window.location.href = u.pathname + u.search + u.hash;
 }
 
-/** Путь к редактору относительно `base` (dev: `/editor`, prod: `/technique_quiz/editor`). */
+/** Путь к редактору относительно `base` (например `/editor`). */
 export function editorHref(): string {
   const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
   return `${base}editor`;
