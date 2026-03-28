@@ -200,21 +200,39 @@ body,
   -webkit-backdrop-filter: blur(4px);
 }
 
-.game-pause-icon-stage {
+.game-pause-icon-stage,
+.start-screen-icon-stage {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
 }
 
-/* Как .start-screen-icon: иконка по центру экрана по вертикали и горизонтали */
-.game-pause-start-icon-wrap {
+/* Строго по центру вьюпорта (та же геометрия, что у паузы) */
+.game-pause-start-icon-wrap,
+.start-screen-start-btn {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  pointer-events: auto;
+}
+
+.game-pause-start-icon-wrap:active,
+.start-screen-start-btn:active {
+  transform: scale(0.985);
 }
 
 .game-pause-menu {
@@ -340,58 +358,41 @@ body,
   transform: scale(0.96);
 }
 
-.start-screen {
-  width: min(980px, 100%);
-  text-align: center;
-  background: rgba(18, 26, 43, 0.95);
-  border: 1px solid rgba(128, 151, 196, 0.22);
-  border-radius: 22px;
-  padding: clamp(28px, 4vw, 64px);
-  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.55);
-}
-
 .start-screen-layout {
+  position: relative;
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow: hidden;
+  background: #0a0d14;
+}
+
+/* Нижний блок — как .game-pause-menu: safe-area и центрирование по ширине */
+.start-screen-footer {
+  position: absolute;
+  left: max(16px, var(--safe-left));
+  right: max(16px, var(--safe-right));
+  bottom: max(16px, var(--safe-bottom));
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  background: #0a0d14;
-}
-
-.start-screen-icon {
-  position: fixed;
-  inset: 0;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: #0a0d14;
-  border: none;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  box-shadow: none;
-}
-
-.start-screen-layout .start-screen-icon {
-  position: relative;
-  inset: auto;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  height: auto;
+  gap: 8px;
+  max-width: min(42rem, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  pointer-events: auto;
 }
 
 .start-screen-disclaimer {
   margin: 0;
-  padding: 8px 16px max(16px, env(safe-area-inset-bottom));
+  padding: 0;
   font-size: 0.68rem;
   line-height: 1.4;
   color: rgba(248, 251, 255, 0.42);
   text-align: center;
-  max-width: 42rem;
-  align-self: center;
+  width: 100%;
 }
 
 .start-icon {
@@ -680,19 +681,6 @@ body,
 
 .outro-restart-btn:active {
   transform: scale(0.92);
-}
-
-.start-screen h1 {
-  margin: 0 0 14px;
-  font-size: clamp(2rem, 5vw, 4.1rem);
-  letter-spacing: 0.02em;
-  font-weight: 700;
-}
-
-.start-screen p {
-  margin: 0 0 28px;
-  color: #9ca8bd;
-  font-size: clamp(1.05rem, 2vw, 1.7rem);
 }
 
 .quiz-screen {

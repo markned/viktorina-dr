@@ -66,14 +66,20 @@ export function GamePauseToggle({
         <div className="game-pause-layer">
           <div className="game-pause-scrim" aria-hidden />
           <div className="game-pause-icon-stage">
-            <div className="game-pause-start-icon-wrap" aria-hidden>
+            <button
+              type="button"
+              className="game-pause-start-icon-wrap"
+              onClick={onToggle}
+              disabled={disabled}
+              aria-label="Продолжить игру"
+            >
               <img
                 src={assetUrl("/content/icons/pause-icon.png")}
                 alt=""
                 className="start-icon"
                 draggable={false}
               />
-            </div>
+            </button>
             <PauseHintsPanel gameMode={gameMode} />
             <div className="game-pause-menu">
               <button
