@@ -6,13 +6,13 @@ import { useCoarsePointer } from "./useCoarsePointer";
 import { useGesturePauseLayout } from "./useGesturePauseLayout";
 import { pickLyricLines } from "../helpers/lyrics";
 import { getYouTubeEmbedUrl, toLocalMediaUrl } from "../helpers/media";
-import { markControlsHintSeen, shouldShowControlsHint } from "../helpers/controlsHintsGate";
 import { buildQuizEligiblePool, buildQuizSessionPlayOrder } from "../helpers/quizMode";
 import { buildQuizOptions } from "../helpers/quizOptions";
 import { buildSessionPlayOrder } from "../helpers/quizOrder";
 import { buildBackgroundPhotoSequence } from "../helpers/backgroundPhotos";
 import {
   assetUrl,
+  assetUrlVideoRelative,
   getGuessSeconds,
   OUTRO_QUIZ_VIDEOS,
   OUTRO_VIDEO_PATH,
@@ -30,7 +30,7 @@ import {
 } from "../helpers/quizPlayback";
 import { createAccurateCountdown, fadeInVolume, fadeOutVolume } from "../helpers/timing";
 import {
-  playQuizTimerEndSound,
+  playQuizAnswerFeedbackSound,
   playTimerEndSound,
   playTimerTickSound,
   setTimerSoundsDucked,
@@ -108,7 +108,6 @@ export function useQuizGame() {
   const [quizScore, setQuizScore] = useState(0);
   const [quizOptions, setQuizOptions] = useState<string[]>([]);
   const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
-  const [showControlsHintOverlay, setShowControlsHintOverlay] = useState(false);
   const [upcomingRoundTitle, setUpcomingRoundTitle] = useState<string>(() => previewRound?.title ?? "");
   const [visibleHintLineCount, setVisibleHintLineCount] = useState(0);
   const [gamePaused, setGamePaused] = useState(false);
@@ -182,13 +181,18 @@ export function useQuizGame() {
   );
 
   const round = orderedRounds[roundIndex];
-  const roundYoutubeBackgroundEmbed = round?.backgroundYoutube
-    ? getYouTubeEmbedUrl(round.backgroundYoutube.url, round.backgroundYoutube.start, {
-        muted: true,
-        controls: false,
-        loop: true,
-      })
+  const roundVideoBackgroundUrl = round?.backgroundVideo
+    ? assetUrlVideoRelative(round.backgroundVideo.file)
     : null;
+  const roundVideoBackgroundStart = round?.backgroundVideo?.start ?? 0;
+  const roundYoutubeBackgroundEmbed =
+    round?.backgroundVideo || !round?.backgroundYoutube
+      ? null
+      : getYouTubeEmbedUrl(round.backgroundYoutube.url, round.backgroundYoutube.start, {
+          muted: true,
+          controls: false,
+          loop: true,
+        });
   const roundPhotoBackground =
     round && randomPhotoSequence[roundIndex]
       ? assetUrl(`/content/photos/${randomPhotoSequence[roundIndex]}`)
@@ -260,9 +264,11 @@ export function useQuizGame() {
   const finalizeQuizRound = () => {
     const selected = selectedQuizIndexRef.current;
     const correctIdx = quizCorrectIndexRef.current;
-    if (selected !== null && selected === correctIdx) {
+    const isCorrect = selected !== null && selected === correctIdx;
+    if (isCorrect) {
       setQuizScore((s) => s + 1);
     }
+    playQuizAnswerFeedbackSound(isCorrect);
     clearQuizFeedbackTimeout();
     setRoundState("quiz_feedback");
     quizFeedbackTimeoutRef.current = window.setTimeout(() => {
@@ -286,7 +292,6 @@ export function useQuizGame() {
       },
       () => {
         if (gameModeRef.current === "quiz") {
-          playQuizTimerEndSound();
           finalizeQuizRound();
         } else {
           playTimerEndSound();
@@ -644,11 +649,15 @@ export function useQuizGame() {
 
   const skipIntroAndGoToRules = () => {
     setIsStartCinematic(false);
-    setRoundState("mode_select");
+    setRoundState("game_rules");
   };
 
   const onIntroVideoEnded = () => {
     setIsStartCinematic(false);
+    setRoundState("game_rules");
+  };
+
+  const skipGameRulesToModeSelect = () => {
     setRoundState("mode_select");
   };
 
@@ -660,23 +669,9 @@ export function useQuizGame() {
   };
 
   const skipRulesAndStart = () => {
-    const mode = gameModeRef.current;
-    if (!mode) {
+    if (!gameModeRef.current) {
       return;
     }
-    if (shouldShowControlsHint(mode)) {
-      setShowControlsHintOverlay(true);
-      return;
-    }
-    beginGameFromRules();
-  };
-
-  const dismissControlsHintAndStart = () => {
-    const mode = gameModeRef.current;
-    if (mode) {
-      markControlsHintSeen(mode);
-    }
-    setShowControlsHintOverlay(false);
     beginGameFromRules();
   };
 
@@ -789,7 +784,6 @@ export function useQuizGame() {
     setShowRestartConfirm(false);
     setShowExitConfirm(false);
     setShowRulesOverlay(false);
-    setShowControlsHintOverlay(false);
     playerRef.current?.pause();
     playerRef.current?.setVolume(1);
     if (previewRound) {
@@ -809,47 +803,32 @@ export function useQuizGame() {
     setRoundState("intro");
   };
 
-  const restartQuiz = () => {
+  /** Пауза / аутро: вернуться к выбору режима (не к стартовому экрану) */
+  const returnToModeSelect = () => {
     if (previewRound) {
-      stopPlaybackTimersAndFade();
-      setGamePaused(false);
-      setShowRulesOverlay(false);
-      playerRef.current?.pause();
-      playerRef.current?.setVolume(1);
-      setRoundIndex(0);
-      setVisibleHintLineCount(0);
-      resetHiddenRevealTap();
-      setTimerSeconds(getGuessSeconds(previewRound.revealLineIds.length));
-      setIsStartCinematic(false);
-      setUpcomingRoundTitle(transitionOverlayTitle(0, [previewRound]));
-      setRoundState("transition");
-      setTimeout(() => void loadRoundAtIndex(0), ROUND_DELAY_MS);
+      window.location.href = editorHref();
       return;
     }
     stopPlaybackTimersAndFade();
     setGamePaused(false);
+    setShowRestartConfirm(false);
+    setShowExitConfirm(false);
     setShowRulesOverlay(false);
     playerRef.current?.pause();
     playerRef.current?.setVolume(1);
-    const visible = visibleRoundsForSession();
-    const mode = gameModeRef.current ?? "freestyle";
-    let newOrder: Round[];
-    if (mode === "quiz") {
-      quizDistractorPoolRef.current = buildQuizEligiblePool(visible);
-      newOrder = buildQuizSessionPlayOrder(visible);
-    } else {
-      newOrder = buildSessionPlayOrder(visible);
-    }
-    setPlayOrder(newOrder);
     setRoundIndex(0);
     setVisibleHintLineCount(0);
     resetHiddenRevealTap();
     setQuizScore(0);
-    setTimerSeconds(getGuessSeconds(newOrder[0]?.revealLineIds.length ?? 1));
+    setQuizOptions([]);
+    setSelectedQuizIndex(null);
+    setQuizCorrectIndex(0);
+    setTimerSeconds(60);
+    setGameMode(null);
+    quizDistractorPoolRef.current = [];
+    setPlayOrder(buildSessionPlayOrder(visibleRoundsForSession()));
     setIsStartCinematic(false);
-    setUpcomingRoundTitle(transitionOverlayTitle(0, newOrder));
-    setRoundState("transition");
-    setTimeout(() => void loadRoundAtIndex(0), ROUND_DELAY_MS);
+    setRoundState("mode_select");
   };
 
   const outroVideoSrc = useMemo(() => {
@@ -888,6 +867,8 @@ export function useQuizGame() {
     orderedRounds,
     round,
     roundPhotoBackground,
+    roundVideoBackgroundUrl,
+    roundVideoBackgroundStart,
     roundYoutubeBackgroundEmbed,
     hintLines,
     revealLines,
@@ -900,7 +881,7 @@ export function useQuizGame() {
     handleRevealClick,
     nextRound,
     exitToStartScreen,
-    restartQuiz,
+    returnToModeSelect,
     previewMode: !!previewRound,
     previewLoading,
     gameMode,
@@ -913,7 +894,6 @@ export function useQuizGame() {
     selectGameMode,
     quizEligibleCount,
     outroVideoSrc,
-    showControlsHintOverlay,
-    dismissControlsHintAndStart,
+    skipGameRulesToModeSelect,
   };
 }

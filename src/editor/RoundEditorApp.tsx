@@ -65,6 +65,10 @@ export function RoundEditorApp() {
         const { backgroundYoutube: _, ...rest } = merged;
         merged = rest as Round;
       }
+      if (Object.prototype.hasOwnProperty.call(patch, "backgroundVideo") && patch.backgroundVideo === undefined) {
+        const { backgroundVideo: _, ...rest } = merged;
+        merged = rest as Round;
+      }
       next[i] = merged;
       return next;
     });
@@ -466,7 +470,12 @@ export function RoundEditorApp() {
                 type="button"
                 className="editor-btn"
                 onClick={() => {
-                  if (!confirm("Выполнить git add, commit и push для rounds.ts и public/content/audio/music/?")) return;
+                  if (
+                    !confirm(
+                      "Выполнить git add, commit и push для rounds.ts, public/content/audio/music/, public/content/audio/ui/ и public/content/video/?",
+                    )
+                  )
+                    return;
                   void (async () => {
                     setGeniusStatus("Git: выполняется…");
                     const result = await pushDatabaseGit(rounds.length);
@@ -671,41 +680,44 @@ export function RoundEditorApp() {
           </section>
 
           <section className="editor-section">
-            <h2>Фон YouTube (опционально)</h2>
-            <p className="editor-muted">Только для этого раунда; оставьте URL пустым, чтобы использовать обычное фото.</p>
+            <h2>Фон видео (опционально)</h2>
+            <p className="editor-muted">
+              Файл в <code>public/content/video/</code> (например <code>bg/bg_round_8.mp4</code>). Пустое поле — только фото
+              смены раунда.
+            </p>
             <label className="editor-field">
-              <span>URL ролика</span>
+              <span>Имя файла видео</span>
               <input
-                type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
-                value={round.backgroundYoutube?.url ?? ""}
+                type="text"
+                placeholder="bg/bg_round_8.mp4"
+                value={round.backgroundVideo?.file ?? ""}
                 onChange={(e) => {
-                  const url = e.target.value.trim();
-                  if (!url) {
-                    updateRound({ backgroundYoutube: undefined });
+                  const file = e.target.value.trim();
+                  if (!file) {
+                    updateRound({ backgroundVideo: undefined });
                     return;
                   }
                   updateRound({
-                    backgroundYoutube: {
-                      url,
-                      start: round.backgroundYoutube?.start ?? 0,
+                    backgroundVideo: {
+                      file,
+                      start: round.backgroundVideo?.start ?? 0,
                     },
                   });
                 }}
               />
             </label>
             <label className="editor-field">
-              <span>Старт фона (сек)</span>
+              <span>Старт зацикливания (сек)</span>
               <input
                 type="number"
-                step="1"
-                value={round.backgroundYoutube?.start ?? 0}
-                disabled={!round.backgroundYoutube?.url}
+                step="0.5"
+                value={round.backgroundVideo?.start ?? 0}
+                disabled={!round.backgroundVideo?.file}
                 onChange={(e) => {
                   const start = parseFloat(e.target.value) || 0;
-                  if (!round.backgroundYoutube?.url) return;
+                  if (!round.backgroundVideo?.file) return;
                   updateRound({
-                    backgroundYoutube: { ...round.backgroundYoutube, start },
+                    backgroundVideo: { ...round.backgroundVideo, start },
                   });
                 }}
               />

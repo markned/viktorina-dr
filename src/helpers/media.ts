@@ -9,7 +9,7 @@ export const toLocalMediaUrl = (round: Round): string => {
     .toLowerCase()
     .replaceAll(/[^a-z0-9]+/g, "-")
     .replaceAll(/^-+|-+$/g, "");
-  return audioMusicUrl(`${slug || String(round.id)}.mp3`);
+  return audioMusicUrl(`${slug || String(round.id)}.m4a`);
 };
 
 /** Извлекает id ролика из watch / embed / shorts / youtu.be / music.youtube.com */

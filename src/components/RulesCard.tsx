@@ -1,39 +1,39 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { useFitTextToHeight } from "../hooks/useFitTextToHeight";
-import { GAME_RULES } from "../content/rules";
-import { RULES_AUDIO_DELAY_MS, RULES_AUDIO_PATH } from "../helpers/quizConfig";
+import { GAME_RULES_COMMON } from "../content/rules";
+import { RULES_AUDIO_DELAY_MS } from "../helpers/quizConfig";
 import type { GameMode } from "../types";
 import { whenAudioUnlocked } from "../lib/audioUnlock";
 import { boostRulesNarration } from "../lib/volumeBoost";
 
 type RulesCardProps = {
   footer: ReactNode;
-  /** Озвучка rules.mp3 (на экране правил после интро — да; из паузы — нет) */
+  /** Озвучка `audioSrc` (по умолчанию выключена — общий экран без автозвука) */
   playAudio?: boolean;
   /** Текст правил (по умолчанию фристайл) */
   rulesText?: string;
   /** Заголовок карточки */
   rulesTitle?: string;
-  /** Путь к озвучке */
+  /** Путь к озвучке (нужен, если `playAudio`) */
   audioSrc?: string;
-  /** Режим для aria */
-  mode?: GameMode;
+  /** Режим для разметки / aria */
+  mode?: GameMode | "common";
 };
 
 /** Текст правил + опциональная озвучка; подвал (→ или ✕) задаётся снаружи */
 export function RulesCard({
   footer,
-  playAudio = true,
-  rulesText = GAME_RULES,
+  playAudio = false,
+  rulesText = GAME_RULES_COMMON,
   rulesTitle = "Правила игры",
-  audioSrc = RULES_AUDIO_PATH,
+  audioSrc,
   mode = "freestyle",
 }: RulesCardProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { containerRef, textRef } = useFitTextToHeight({ maxPx: 44, floorMinPx: 8 });
 
   useEffect(() => {
-    if (!playAudio) {
+    if (!playAudio || !audioSrc) {
       return;
     }
     let cancelled = false;

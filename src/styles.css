@@ -137,6 +137,10 @@ body,
   backface-visibility: hidden;
 }
 
+video.youtube-bg.quiz-bg-video {
+  object-fit: cover;
+}
+
 .photo-bg {
   position: fixed;
   top: 0;
@@ -557,6 +561,23 @@ body,
   min-height: 0;
   overflow: hidden;
   display: flex;
+}
+
+.controls-screen-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.controls-hint-list--in-rules {
+  margin: 0;
+  padding: 0 0 6px;
+  width: 100%;
+  align-self: flex-start;
+  list-style: none;
+}
+
+.controls-screen-card .controls-hint-item {
+  align-items: flex-start;
 }
 
 /* Кегль задаётся в JS (useFitTextToHeight), до первого измерения — запасной размер */
@@ -1526,43 +1547,6 @@ body,
   }
 }
 
-.controls-hint-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: max(12px, var(--safe-top)) max(12px, var(--safe-right)) max(12px, var(--safe-bottom))
-    max(12px, var(--safe-left));
-}
-
-.controls-hint-scrim {
-  position: absolute;
-  inset: 0;
-  background: rgba(8, 10, 16, 0.78);
-  backdrop-filter: blur(6px);
-}
-
-.controls-hint-card {
-  position: relative;
-  z-index: 1;
-  width: min(440px, 100%);
-  max-height: min(80vh, 560px);
-  overflow: auto;
-  background: rgba(18, 26, 43, 0.98);
-  border: 1px solid rgba(128, 151, 196, 0.35);
-  border-radius: 20px;
-  padding: 20px 22px 18px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
-}
-
-.controls-hint-title {
-  margin: 0 0 14px;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
 .controls-hint-list {
   margin: 0;
   padding: 0;
@@ -1619,21 +1603,6 @@ body,
   0%, 100% { transform: translateX(0); }
   33% { transform: translateX(-3px); }
   66% { transform: translateX(3px); }
-}
-
-.controls-hint-ok {
-  margin-top: 18px;
-  width: 100%;
-  padding: 14px;
-  border: 0;
-  border-radius: 14px;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  touch-action: manipulation;
 }
 
 .start-screen-author {

@@ -1,13 +1,44 @@
 import { execFileSync } from "node:child_process";
+import { existsSync, unlinkSync } from "node:fs";
 import type { IncomingMessage } from "node:http";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, dirname, extname, join } from "node:path";
 import type { Plugin } from "vite";
 
 function sanitizeAudioFilename(name: string): string {
   const base = name.replace(/^.*[/\\]/, "").replace(/\.\./g, "");
-  if (!base || base.length > 220) return "track.mp3";
+  if (!base || base.length > 220) return "track.m4a";
   return base;
+}
+
+/** После сохранения: AAC 192 в .m4a (нужен ffmpeg в PATH). */
+function tryTranscodeUploadToM4aAac192(inputPath: string): string | null {
+  const ext = extname(inputPath).toLowerCase();
+  if (ext === ".m4a") return null;
+  const base = basename(inputPath, ext);
+  const outPath = join(dirname(inputPath), `${base}.m4a`);
+  try {
+    execFileSync(
+      "ffmpeg",
+      ["-y", "-i", inputPath, "-vn", "-c:a", "aac", "-b:a", "192k", outPath],
+      { stdio: "ignore", timeout: 300_000 },
+    );
+    if (existsSync(outPath)) {
+      try {
+        unlinkSync(inputPath);
+      } catch {
+        /* оставляем оба файла */
+      }
+      return `${base}.m4a`;
+    }
+  } catch {
+    try {
+      if (existsSync(outPath)) unlinkSync(outPath);
+    } catch {
+      /* ignore */
+    }
+  }
+  return null;
 }
 
 function hasGitStagedDiff(cwd: string): boolean {
@@ -70,9 +101,12 @@ export function editorDevPlugin(): Plugin {
             const dir = join(server.config.root, "public/content/audio/music");
             await mkdir(dir, { recursive: true });
             const buf = Buffer.from(body.dataBase64, "base64");
-            await writeFile(join(dir, name), buf);
+            const absIn = join(dir, name);
+            await writeFile(absIn, buf);
+            const converted = tryTranscodeUploadToM4aAac192(absIn);
+            const finalName = converted ?? name;
             res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify({ ok: true, filename: name }));
+            res.end(JSON.stringify({ ok: true, filename: finalName }));
           } catch (e) {
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
@@ -100,10 +134,16 @@ export function editorDevPlugin(): Plugin {
             const body = (await readJsonBody(req)) as { roundsCount?: number };
             const n = typeof body.roundsCount === "number" && Number.isFinite(body.roundsCount) ? Math.floor(body.roundsCount) : 0;
             const root = server.config.root;
-            const msg = `База: ${n} треков (rounds.ts и music/)`;
+            const msg = `База: ${n} треков (rounds.ts, music/, ui/, video/)`;
             execFileSync(
               "git",
-              ["add", "src/content/rounds/rounds.ts", "public/content/audio/music"],
+              [
+                "add",
+                "src/content/rounds/rounds.ts",
+                "public/content/audio/music",
+                "public/content/audio/ui",
+                "public/content/video",
+              ],
               { cwd: root, stdio: "pipe" },
             );
             if (!hasGitStagedDiff(root)) {

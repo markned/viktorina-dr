@@ -36,7 +36,7 @@ export class LocalMediaPlayer implements PlayerAdapter {
       this.media.src = source;
       this.media.load();
       this.media.addEventListener("error", onError, { once: true });
-      // canplay — буфер готов; только loadedmetadata недостаточно для стабильного seek на длинных mp3
+      // canplay — буфер готов; только loadedmetadata недостаточно для стабильного seek на длинных треках
       this.media.addEventListener("canplay", onReady, { once: true });
       if (this.media.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
         queueMicrotask(onReady);

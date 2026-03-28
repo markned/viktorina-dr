@@ -5,20 +5,29 @@ function formatRound(r: Round): string {
     .map((l) => `      { id: ${l.id}, text: ${JSON.stringify(l.text)} },`)
     .join("\n");
 
-  const bgBlock = r.backgroundYoutube
+  const bgVideoBlock = r.backgroundVideo
     ? `
+    backgroundVideo: {
+      file: ${JSON.stringify(r.backgroundVideo.file)},
+      start: ${r.backgroundVideo.start},
+    },`
+    : "";
+
+  const bgYoutubeBlock =
+    !r.backgroundVideo && r.backgroundYoutube
+      ? `
     backgroundYoutube: {
       url: ${JSON.stringify(r.backgroundYoutube.url)},
       start: ${r.backgroundYoutube.start},
     },`
-    : "";
+      : "";
 
   const hiddenBlock = r.hidden ? `\n    hidden: true,` : "";
 
   return `  {
     id: ${r.id},
     title: ${JSON.stringify(r.title)},
-    audioFile: ${JSON.stringify(r.audioFile)},${hiddenBlock}${bgBlock}
+    audioFile: ${JSON.stringify(r.audioFile)},${hiddenBlock}${bgVideoBlock}${bgYoutubeBlock}
     start: ${r.start},
     end: ${r.end},
     lyrics: [
@@ -33,7 +42,7 @@ ${lyricLines}
 export function exportRoundsTsFile(rounds: Round[]): string {
   const header = `import type { Round } from "../../types";
 
-/** Все раунды викторины. Аудио — имена файлов в \`public/content/audio/music/\`. */
+/** Все раунды викторины. Аудио — \`public/content/audio/music/\` (предпочтительно AAC .m4a). Фон — путь от \`public/content/video/\` (например \`bg/…\`). */
 `;
 
   const roundsArr = rounds.map(formatRound).join("\n");

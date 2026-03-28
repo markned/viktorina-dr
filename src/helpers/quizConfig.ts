@@ -11,6 +11,17 @@ const BASE = `${(import.meta.env.BASE_URL ?? "/").replace(/\/?$/, "/")}`;
 export const assetUrl = (path: string) =>
   BASE + (path.startsWith("/") ? path.slice(1) : path);
 
+/** Путь к файлу в `public/content/video/` с подпапками (кодируется каждое имя сегмента). */
+export const assetUrlVideoRelative = (relativePath: string) =>
+  assetUrl(
+    `/content/video/${relativePath
+      .trim()
+      .split(/[/\\]+/)
+      .filter(Boolean)
+      .map((s) => encodeURIComponent(s))
+      .join("/")}`,
+  );
+
 /**
  * Тайминги викторины — правь здесь:
  * - getGuessSeconds(revealLineCount) — 1 строка ответа=30с, 2=45с, 3+=60с
@@ -33,30 +44,35 @@ export const ROUND_DELAY_MS = 2000;
 export const QUIZ_FEEDBACK_DELAY_MS = 1800;
 export const INTRO_VIDEO_SECONDS = 15;
 
-export const TIMER_COUNT_SOUND = assetUrl("/content/audio/timercount.mp3");
-export const TIMER_END_SOUND = assetUrl("/content/audio/timerend.mp3");
+/** UI: таймер, правила, SFX — `public/content/audio/ui/`, единый формат AAC `.m4a` 192 kbps */
+export const TIMER_COUNT_SOUND = assetUrl("/content/audio/ui/timercount.m4a");
+/** Фристайл: конец таймера — по очереди `timerend.m4a` и `timerend2.m4a`. */
+export const TIMER_END_SOUND = assetUrl("/content/audio/ui/timerend.m4a");
+export const TIMER_END_SOUND_ALT = assetUrl("/content/audio/ui/timerend2.m4a");
 /** Конец таймера в режиме «Викторина» (озвучка «Давайте думать») */
-export const QUIZ_TIMER_END_SOUND = assetUrl("/content/audio/quizTimerEnd.mp3");
-export const RULES_AUDIO_PATH = assetUrl("/content/audio/rules.mp3");
-export const RULES_QUIZ_AUDIO_PATH = assetUrl("/content/audio/rules_quiz.mp3");
+export const QUIZ_TIMER_END_SOUND = assetUrl("/content/audio/ui/quizTimerEnd.m4a");
+/** Звук при выборе ответа в викторине. */
+export const QUIZ_ANSWER_RIGHT_SOUND = assetUrl("/content/audio/ui/rightanswerselect.m4a");
+export const QUIZ_ANSWER_WRONG_SOUND = assetUrl("/content/audio/ui/wronganswerselect.m4a");
+/** Задержка перед опциональной озвучкой правил (`RulesCard` с `playAudio` + `audioSrc`) */
 export const RULES_AUDIO_DELAY_MS = 2000;
-export const INTRO_VIDEO_PATH = assetUrl("/content/video/intro.mp4");
+export const INTRO_VIDEO_PATH = assetUrl("/content/video/ui/intro.mp4");
 
-/** Фон половин экрана выбора режима (сжатый MP4, исходники .mov в `public/content/video/`) */
-export const MODE_SELECT_FREESTYLE_VIDEO = assetUrl("/content/video/freestyleMenu.mp4");
-export const MODE_SELECT_QUIZ_VIDEO = assetUrl("/content/video/quizMenu.mp4");
-export const OUTRO_VIDEO_PATH = assetUrl("/content/video/outro.mp4");
+/** Фон половин экрана выбора режима — `public/content/video/ui/` */
+export const MODE_SELECT_FREESTYLE_VIDEO = assetUrl("/content/video/ui/freestyleMenu.mp4");
+export const MODE_SELECT_QUIZ_VIDEO = assetUrl("/content/video/ui/quizMenu.mp4");
+export const OUTRO_VIDEO_PATH = assetUrl("/content/video/ui/outro.mp4");
 
-/** Финальные ролики викторины по числу правильных ответов (плейсхолдеры — заменить файлами). */
+/** Финальные ролики викторины — `public/content/video/quiz/` */
 export const OUTRO_QUIZ_VIDEOS = [
-  assetUrl("/content/video/outro_quiz_0.mp4"),
-  assetUrl("/content/video/outro_quiz_1.mp4"),
-  assetUrl("/content/video/outro_quiz_2.mp4"),
-  assetUrl("/content/video/outro_quiz_3.mp4"),
-  assetUrl("/content/video/outro_quiz_4.mp4"),
+  assetUrl("/content/video/quiz/1.mp4"),
+  assetUrl("/content/video/quiz/2.mp4"),
+  assetUrl("/content/video/quiz/3.mp4"),
+  assetUrl("/content/video/quiz/4.mp4"),
+  assetUrl("/content/video/quiz/5.mp4"),
 ] as const;
 
-/** Индекс ролика 0..4 для счёта правильных ответов в викторине. */
+/** Индекс ролика 0..4 для счёта правильных ответов в викторине → файлы 1…5.mp4. */
 export function outroQuizVideoIndexForScore(score: number): number {
   if (score <= 2) return 0;
   if (score <= 5) return 1;

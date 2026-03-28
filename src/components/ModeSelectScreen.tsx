@@ -116,7 +116,7 @@ export function ModeSelectScreen({ onSelectMode, quizEligibleCount }: ModeSelect
           videoSrc={MODE_SELECT_FREESTYLE_VIDEO}
           tint="green"
           title="Фристайл"
-          description="Вариант для игры в компании у большого экрана."
+          description="Продолжи строчки вслух"
           onSelect={() => onSelectMode("freestyle")}
           demoActive={demo.demoActiveFreestyle}
           onVideoEnded={demo.onDemoEndedFreestyle}
@@ -126,7 +126,7 @@ export function ModeSelectScreen({ onSelectMode, quizEligibleCount }: ModeSelect
           videoSrc={MODE_SELECT_QUIZ_VIDEO}
           tint="red"
           title="Викторина"
-          description="Вариант для игры в соло с мобилы."
+          description="Выбери из 4"
           disabled={quizDisabled}
           disabledHint={`Нужно минимум 4 раунда с одной строкой ответа (сейчас ${quizEligibleCount}).`}
           onSelect={() => onSelectMode("quiz")}

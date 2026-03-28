@@ -74,7 +74,7 @@ export function defaultAudioFileForTitle(title: string): string {
     .toLowerCase()
     .replaceAll(/[^a-z0-9а-яё]+/gi, "-")
     .replaceAll(/^-+|-+$/g, "");
-  return `${slug || "track"}.mp3`;
+  return `${slug || "track"}.m4a`;
 }
 
 /**

@@ -19,9 +19,9 @@ function usePauseHintText(gameMode: GameMode | null): string {
       return "Пауза — клавиша Esc";
     })();
     if (gameMode === "quiz") {
-      return `${pause} · Викторина: выберите вариант и «✓», пробел подтверждает.`;
+      return `${pause} · Викторина: выбери из 4 — вариант, «✓» или пробел.`;
     }
-    return `${pause} · Фристайл: после таймера — пробел или 👁.`;
+    return `${pause} · Фристайл: ответ вслух, затем пробел или 👁.`;
   }, [gesturePause, coarse, gameMode]);
 }
 

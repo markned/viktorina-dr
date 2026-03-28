@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BACKGROUND_CROSSFADE_MS } from "../helpers/quizConfig";
 
 type DualState = {
@@ -38,10 +38,13 @@ function useDualCrossfade(current: string | null): DualState {
 type QuizBackgroundProps = {
   photoUrl: string | null;
   youtubeSrc: string | null;
+  videoSrc: string | null;
+  videoStartSec?: number;
 };
 
-export function QuizBackground({ photoUrl, youtubeSrc }: QuizBackgroundProps) {
-  const useYoutube = !!youtubeSrc;
+export function QuizBackground({ photoUrl, youtubeSrc, videoSrc, videoStartSec = 0 }: QuizBackgroundProps) {
+  const useVideo = !!videoSrc;
+  const useYoutube = !useVideo && !!youtubeSrc;
   const photo = useDualCrossfade(photoUrl);
 
   const t = `${BACKGROUND_CROSSFADE_MS}ms`;
@@ -52,7 +55,7 @@ export function QuizBackground({ photoUrl, youtubeSrc }: QuizBackgroundProps) {
       <div
         className="quiz-bg-surface quiz-bg-surface-photo"
         style={{
-          opacity: useYoutube ? 0 : 1,
+          opacity: useVideo || useYoutube ? 0 : 1,
           transition: `opacity ${t} ${ease}`,
         }}
       >
@@ -101,6 +104,50 @@ export function QuizBackground({ photoUrl, youtubeSrc }: QuizBackgroundProps) {
           </div>
         ) : null}
       </div>
+
+      <div
+        className="quiz-bg-surface quiz-bg-surface-youtube"
+        style={{
+          opacity: useVideo ? 1 : 0,
+          transition: `opacity ${t} ${ease}`,
+        }}
+      >
+        {useVideo && videoSrc ? (
+          <div className="youtube-bg-dual">
+            <div className="youtube-bg-wrap youtube-bg-wrap-layer">
+              <BackgroundVideo key={videoSrc} src={videoSrc} startSec={videoStartSec} />
+            </div>
+            <div className="youtube-bg-dim-scrim" aria-hidden />
+          </div>
+        ) : null}
+      </div>
     </div>
+  );
+}
+
+function BackgroundVideo({ src, startSec }: { src: string; startSec: number }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.currentTime = startSec;
+    void el.play().catch(() => {});
+  }, [src, startSec]);
+
+  return (
+    <video
+      ref={ref}
+      className="youtube-bg quiz-bg-video"
+      src={src}
+      autoPlay
+      muted
+      playsInline
+      loop
+      preload="auto"
+      onLoadedMetadata={(e) => {
+        e.currentTarget.currentTime = startSec;
+      }}
+    />
   );
 }

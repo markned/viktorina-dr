@@ -1,11 +1,11 @@
 import type { Round } from "../../types";
 
-/** Все раунды викторины. Аудио — имена файлов в `public/content/audio/music/`. */
+/** Все раунды викторины. Аудио — `public/content/audio/music/`. Фон — путь от `public/content/video/` (например `bg/…`). */
 export const rounds: Round[] = [
   {
     id: 1,
     title: "Черная дыра",
-    audioFile: "Черная дыра.mp3",
+    audioFile: "Черная дыра.m4a",
     start: 21,
     end: 30.25,
     lyrics: [
@@ -21,7 +21,7 @@ export const rounds: Round[] = [
   {
     id: 2,
     title: "В аквапарке",
-    audioFile: "В аквапарке.mp3",
+    audioFile: "В аквапарке.m4a",
     start: 23,
     end: 29,
     lyrics: [
@@ -36,7 +36,7 @@ export const rounds: Round[] = [
   {
     id: 3,
     title: "Ебу закон",
-    audioFile: "Ебу закон.mp3",
+    audioFile: "Ебу закон.m4a",
     start: 12,
     end: 20.5,
     lyrics: [
@@ -51,7 +51,7 @@ export const rounds: Round[] = [
   {
     id: 4,
     title: "Ебу закон",
-    audioFile: "Ебу закон.mp3",
+    audioFile: "Ебу закон.m4a",
     start: 34.5,
     end: 45.5,
     lyrics: [
@@ -68,7 +68,7 @@ export const rounds: Round[] = [
   {
     id: 5,
     title: "Море или океан",
-    audioFile: "Море или океан.mp3",
+    audioFile: "Море или океан.m4a",
     start: 109.5,
     end: 119,
     lyrics: [
@@ -85,7 +85,7 @@ export const rounds: Round[] = [
   {
     id: 6,
     title: "Гитлер",
-    audioFile: "Гитлер.mp3",
+    audioFile: "Гитлер.m4a",
     start: 81.5,
     end: 89.5,
     lyrics: [
@@ -101,7 +101,7 @@ export const rounds: Round[] = [
   {
     id: 7,
     title: "Это жизнь",
-    audioFile: "Это жизнь.mp3",
+    audioFile: "Это жизнь.m4a",
     start: 3,
     end: 6,
     lyrics: [
@@ -118,9 +118,9 @@ export const rounds: Round[] = [
   {
     id: 8,
     title: "Не прут колеса",
-    audioFile: "Не прут колеса.mp3",
-    backgroundYoutube: {
-      url: "https://www.youtube.com/watch?v=NOuIXUmFc3g",
+    audioFile: "Не прут колеса.m4a",
+    backgroundVideo: {
+      file: "bg/bg_round_8.mp4",
       start: 84,
     },
     start: 27,
@@ -138,9 +138,9 @@ export const rounds: Round[] = [
   {
     id: 9,
     title: "За кем стоит андеграунд",
-    audioFile: "За кем стоит Андерграунд.mp3",
-    backgroundYoutube: {
-      url: "https://www.youtube.com/watch?v=1hnqwsui5HE&feature=youtu.be",
+    audioFile: "За кем стоит Андерграунд.m4a",
+    backgroundVideo: {
+      file: "bg/bg_round_9.mp4",
       start: 30,
     },
     start: 54.5,
@@ -159,7 +159,7 @@ export const rounds: Round[] = [
   {
     id: 10,
     title: "Заебись",
-    audioFile: "Заебись.mp3",
+    audioFile: "Заебись.m4a",
     start: 77,
     end: 85,
     lyrics: [
@@ -174,7 +174,7 @@ export const rounds: Round[] = [
   {
     id: 11,
     title: "Блевбургер",
-    audioFile: "Блевбургер.mp3",
+    audioFile: "Блевбургер.m4a",
     start: 0,
     end: 3.5,
     lyrics: [
@@ -189,7 +189,7 @@ export const rounds: Round[] = [
   {
     id: 12,
     title: "Черная дыра",
-    audioFile: "Черная дыра.mp3",
+    audioFile: "Черная дыра.m4a",
     start: 86.5,
     end: 98.5,
     lyrics: [
@@ -207,7 +207,7 @@ export const rounds: Round[] = [
   {
     id: 13,
     title: "Короткая песенка",
-    audioFile: "Короткая песенка.mp3",
+    audioFile: "Короткая песенка.m4a",
     start: 36,
     end: 45,
     lyrics: [
@@ -223,7 +223,7 @@ export const rounds: Round[] = [
   {
     id: 14,
     title: "Демоны",
-    audioFile: "Демоны.mp3",
+    audioFile: "Демоны.m4a",
     start: 35,
     end: 39.5,
     lyrics: [
@@ -238,7 +238,7 @@ export const rounds: Round[] = [
   {
     id: 15,
     title: "Лошок",
-    audioFile: "27. Лошок.mp3",
+    audioFile: "27. Лошок.m4a",
     start: 53.61,
     end: 64.59,
     lyrics: [
@@ -254,7 +254,7 @@ export const rounds: Round[] = [
   {
     id: 16,
     title: "Кассир",
-    audioFile: "16. Кассир.mp3",
+    audioFile: "16. Кассир.m4a",
     start: 117.12,
     end: 123.92,
     lyrics: [
@@ -269,7 +269,7 @@ export const rounds: Round[] = [
   {
     id: 17,
     title: "Тубик",
-    audioFile: "Тубик.mp3",
+    audioFile: "Тубик.m4a",
     start: 140.62,
     end: 147.25,
     lyrics: [
@@ -284,7 +284,7 @@ export const rounds: Round[] = [
   {
     id: 18,
     title: "История короче длинная",
-    audioFile: "23. История короче длинная.mp3",
+    audioFile: "23. История короче длинная.m4a",
     start: 144.77,
     end: 155.4,
     lyrics: [
@@ -300,7 +300,7 @@ export const rounds: Round[] = [
   {
     id: 19,
     title: "Ахуенно кого-нибудь убить",
-    audioFile: "02 - Ахуенно кого-нибудь убить ( feat. The Chemodan clan ).mp3",
+    audioFile: "02 - Ахуенно кого-нибудь убить ( feat. The Chemodan clan ).m4a",
     start: 104.6351361702128,
     end: 113.11,
     lyrics: [
@@ -316,7 +316,7 @@ export const rounds: Round[] = [
   {
     id: 20,
     title: "Спасает параноя",
-    audioFile: "18. Спасает параноя.mp3",
+    audioFile: "18. Спасает параноя.m4a",
     start: 163.07,
     end: 171.38,
     lyrics: [
@@ -332,7 +332,7 @@ export const rounds: Round[] = [
   {
     id: 21,
     title: "5 Лет",
-    audioFile: "09. 5 Лет.mp3",
+    audioFile: "09. 5 Лет.m4a",
     start: 85.14602943218095,
     end: 92.96286009301689,
     lyrics: [

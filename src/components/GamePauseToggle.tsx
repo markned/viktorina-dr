@@ -10,7 +10,7 @@ type GamePauseToggleProps = {
   /** Без кнопки: пауза жестом (два пальца) или пробел; при паузе — большая иконка */
   touchMode: boolean;
   gameMode: GameMode | null;
-  onRestartRequest: () => void;
+  onReturnToModeSelectRequest: () => void;
   onExitToStart: () => void;
   onRulesRequest: () => void;
 };
@@ -38,12 +38,12 @@ function PauseHintsPanel({ gameMode }: { gameMode: GameMode | null }) {
       {gameMode === "quiz" ? (
         <div className="game-pause-hint game-pause-hint--shake">
           <span className="game-pause-hint-anim" />
-          <span>Викторина: варианты и ✓, пробел подтверждает</span>
+          <span>Викторина: выбери из 4 — вариант, ✓ или пробел</span>
         </div>
       ) : (
         <div className="game-pause-hint game-pause-hint--shake">
           <span className="game-pause-hint-anim" />
-          <span>Фристайл: после таймера — пробел или 👁</span>
+          <span>Фристайл: продолжи вслух, затем пробел или 👁</span>
         </div>
       )}
     </div>
@@ -56,7 +56,7 @@ export function GamePauseToggle({
   onToggle,
   touchMode,
   gameMode,
-  onRestartRequest,
+  onReturnToModeSelectRequest,
   onExitToStart,
   onRulesRequest,
 }: GamePauseToggleProps) {
@@ -92,9 +92,9 @@ export function GamePauseToggle({
               <button
                 type="button"
                 className="game-pause-menu-btn game-pause-menu-btn--secondary"
-                onClick={onRestartRequest}
+                onClick={onReturnToModeSelectRequest}
               >
-                Перезапуск
+                К режимам
               </button>
               <button type="button" className="game-pause-menu-btn" onClick={onExitToStart}>
                 Выйти

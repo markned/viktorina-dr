@@ -4,11 +4,11 @@ type OutroScreenProps = {
   videoSrc: string;
   /** Подпись под кнопками (например счёт викторины) */
   subtitle?: string;
-  onRestart: () => void;
+  onBackToModeSelect: () => void;
   onExitToStart: () => void;
 };
 
-export function OutroScreen({ videoSrc, subtitle, onRestart, onExitToStart }: OutroScreenProps) {
+export function OutroScreen({ videoSrc, subtitle, onBackToModeSelect, onExitToStart }: OutroScreenProps) {
   const onPlay = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = e.currentTarget;
     video.muted = false;
@@ -32,7 +32,13 @@ export function OutroScreen({ videoSrc, subtitle, onRestart, onExitToStart }: Ou
         </p>
       ) : null}
       <div className="outro-actions">
-        <button type="button" className="outro-restart-btn" onClick={onRestart} title="Перезапустить" aria-label="Перезапустить">
+        <button
+          type="button"
+          className="outro-restart-btn"
+          onClick={onBackToModeSelect}
+          title="К выбору режима"
+          aria-label="К выбору режима"
+        >
           ↻
         </button>
         <button
