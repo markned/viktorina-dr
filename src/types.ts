@@ -28,11 +28,15 @@ export type Round = {
   revealLineIds: number[];
 };
 
+export type GameMode = "freestyle" | "quiz";
+
 export type RoundState =
   | "intro"
+  | "mode_select"
   | "rules"
   | "playing"
   | "paused_for_guess"
+  | "quiz_feedback"
   | "timer_finished"
   | "reveal"
   | "transition"

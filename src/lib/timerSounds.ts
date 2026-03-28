@@ -1,4 +1,4 @@
-import { TIMER_COUNT_SOUND, TIMER_END_SOUND } from "../helpers/quizConfig";
+import { QUIZ_TIMER_END_SOUND, TIMER_COUNT_SOUND, TIMER_END_SOUND } from "../helpers/quizConfig";
 import { whenAudioUnlocked } from "./audioUnlock";
 
 const TICK_BASE_VOL = 0.5;
@@ -30,6 +30,17 @@ export function setTimerSoundsDucked(ducked: boolean): void {
 export function playTimerEndSound(): void {
   stopAllTimerCountSounds();
   const a = new Audio(TIMER_END_SOUND);
+  a.volume = timerSoundsDucked ? 0 : END_BASE_VOL;
+  void a.play().catch(() => {
+    if (timerSoundsDucked) return;
+    whenAudioUnlocked(() => void a.play().catch(() => {}));
+  });
+}
+
+/** Конец таймера в режиме «Викторина» (отдельная озвучка). */
+export function playQuizTimerEndSound(): void {
+  stopAllTimerCountSounds();
+  const a = new Audio(QUIZ_TIMER_END_SOUND);
   a.volume = timerSoundsDucked ? 0 : END_BASE_VOL;
   void a.play().catch(() => {
     if (timerSoundsDucked) return;

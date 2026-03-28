@@ -1,4 +1,6 @@
+import { ControlsHintOverlay } from "./components/ControlsHintOverlay";
 import { IntroScreen } from "./components/IntroScreen";
+import { ModeSelectScreen } from "./components/ModeSelectScreen";
 import { OutroScreen } from "./components/OutroScreen";
 import { GamePauseToggle } from "./components/GamePauseToggle";
 import { QuizBackground } from "./components/QuizBackground";
@@ -34,12 +36,41 @@ export default function App() {
     );
   }
 
+  if (game.roundState === "mode_select") {
+    return (
+      <ModeSelectScreen onSelectMode={game.selectGameMode} quizEligibleCount={game.quizEligibleCount} />
+    );
+  }
+
   if (game.roundState === "rules") {
-    return <RulesScreen onComplete={game.skipRulesAndStart} />;
+    if (!game.gameMode) {
+      return null;
+    }
+    return (
+      <>
+        <RulesScreen onComplete={game.skipRulesAndStart} gameMode={game.gameMode} />
+        {game.showControlsHintOverlay ? (
+          <ControlsHintOverlay
+            open
+            gameMode={game.gameMode}
+            onDismiss={game.dismissControlsHintAndStart}
+          />
+        ) : null}
+      </>
+    );
   }
 
   if (game.roundState === "finished") {
-    return <OutroScreen onRestart={game.restartQuiz} onExitToStart={game.exitToStartScreen} />;
+    const subtitle =
+      game.gameMode === "quiz" ? `Правильных ответов: ${game.quizScore}` : undefined;
+    return (
+      <OutroScreen
+        videoSrc={game.outroVideoSrc}
+        subtitle={subtitle}
+        onRestart={game.restartQuiz}
+        onExitToStart={game.exitToStartScreen}
+      />
+    );
   }
 
   if (!game.round) {
@@ -59,9 +90,10 @@ export default function App() {
       <QuizBackground photoUrl={game.roundPhotoBackground} youtubeSrc={game.roundYoutubeBackgroundEmbed} />
       <GamePauseToggle
         paused={game.gamePaused}
-        disabled={game.roundState === "transition"}
+        disabled={game.roundState === "transition" || game.roundState === "quiz_feedback"}
         onToggle={game.toggleGamePause}
         touchMode={game.gesturePauseLayout}
+        gameMode={game.gameMode}
         onRestartRequest={() => game.setShowRestartConfirm(true)}
         onExitToStart={() => game.setShowExitConfirm(true)}
         onRulesRequest={() => game.setShowRulesOverlay(true)}
@@ -72,13 +104,21 @@ export default function App() {
           roundIndex={game.roundIndex}
           totalRounds={game.orderedRounds.length}
           roundState={game.roundState}
+          gameMode={game.gameMode}
+          quizScore={game.quizScore}
+          quizOptions={game.quizOptions}
+          quizCorrectIndex={game.quizCorrectIndex}
+          selectedQuizIndex={game.selectedQuizIndex}
+          onSelectQuizOption={game.setQuizSelection}
           hintLines={game.hintLines}
           revealLines={game.revealLines}
           visibleHintLineCount={game.visibleHintLineCount}
           timerSeconds={game.timerSeconds}
           totalSeconds={getGuessSeconds(game.revealLines.length)}
+          gamePaused={game.gamePaused}
           onReplaySnippet={game.replaySnippet}
           onReveal={game.handleRevealClick}
+          onConfirmQuiz={game.confirmQuizRound}
           onNextRound={game.nextRound}
         />
       </div>
@@ -98,7 +138,11 @@ export default function App() {
           game.exitToStartScreen();
         }}
       />
-      <RulesOverlay open={game.showRulesOverlay} onClose={() => game.setShowRulesOverlay(false)} />
+      <RulesOverlay
+        open={game.showRulesOverlay}
+        onClose={() => game.setShowRulesOverlay(false)}
+        gameMode={game.gameMode ?? "freestyle"}
+      />
       <TransitionOverlay visible={game.roundState === "transition"} nextRoundTitle={game.upcomingRoundTitle} />
     </main>
   );
