@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
+import { useModeSelectMobileDemo } from "../hooks/useModeSelectMobileDemo";
 import { MODE_SELECT_FREESTYLE_VIDEO, MODE_SELECT_QUIZ_VIDEO } from "../helpers/quizConfig";
+import { prefersHover } from "../lib/mediaQueries";
+import { pauseModeSelectPreview, playModeSelectPreview } from "../lib/modeSelectPaneVideo";
 import { boostVolume } from "../lib/volumeBoost";
 import type { GameMode } from "../types";
 
@@ -10,11 +13,8 @@ type ModeSelectScreenProps = {
 
 type Tint = "green" | "red";
 
-function isHoverDevice(): boolean {
-  return typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches;
-}
-
 type ModeSelectPaneProps = {
+  videoRef: React.RefObject<HTMLVideoElement | null>;
   videoSrc: string;
   tint: Tint;
   title: string;
@@ -22,9 +22,12 @@ type ModeSelectPaneProps = {
   disabled?: boolean;
   disabledHint?: string;
   onSelect: () => void;
+  demoActive?: boolean;
+  onVideoEnded?: () => void;
 };
 
 function ModeSelectPane({
+  videoRef,
   videoSrc,
   tint,
   title,
@@ -32,27 +35,17 @@ function ModeSelectPane({
   disabled,
   disabledHint,
   onSelect,
+  demoActive,
+  onVideoEnded,
 }: ModeSelectPaneProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
   const pauseVideo = useCallback(() => {
-    const el = videoRef.current;
-    if (!el) return;
-    el.pause();
-    el.currentTime = 0;
-  }, []);
+    pauseModeSelectPreview(videoRef.current);
+  }, [videoRef]);
 
   const playVideo = useCallback(() => {
     if (disabled) return;
-    const el = videoRef.current;
-    if (!el) return;
-    el.muted = false;
-    boostVolume(el);
-    void el.play().catch(() => {
-      el.muted = true;
-      void el.play().catch(() => {});
-    });
-  }, [disabled]);
+    playModeSelectPreview(videoRef.current);
+  }, [disabled, videoRef]);
 
   useEffect(() => {
     return () => pauseVideo();
@@ -60,44 +53,43 @@ function ModeSelectPane({
 
   const handlePointerEnter = () => {
     if (disabled) return;
-    if (isHoverDevice()) playVideo();
+    if (prefersHover()) playVideo();
   };
 
   const handlePointerLeave = () => {
-    if (isHoverDevice()) pauseVideo();
-  };
-
-  const handlePointerDown = () => {
-    if (disabled) return;
-    if (!isHoverDevice()) playVideo();
+    if (prefersHover()) pauseVideo();
   };
 
   const handlePlay = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     boostVolume(e.currentTarget);
   };
 
+  const paneClass =
+    `mode-select-pane mode-select-pane--${tint}` +
+    (disabled ? " mode-select-pane--disabled" : "") +
+    (demoActive ? " mode-select-pane--demo-active" : "");
+
   return (
     <button
       type="button"
-      className={`mode-select-pane mode-select-pane--${tint}${disabled ? " mode-select-pane--disabled" : ""}`}
+      className={paneClass}
       onClick={() => {
         if (!disabled) onSelect();
       }}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      onPointerDown={handlePointerDown}
       disabled={disabled}
       aria-disabled={disabled}
     >
       <video
-        ref={videoRef}
+        ref={videoRef as React.Ref<HTMLVideoElement>}
         className="mode-select-pane__video"
         src={videoSrc}
         playsInline
         muted
-        loop
         preload="auto"
         onPlay={handlePlay}
+        onEnded={onVideoEnded}
       />
       <div className={`mode-select-pane__tint mode-select-pane__tint--${tint}`} aria-hidden />
       <div className="mode-select-pane__content">
@@ -111,25 +103,35 @@ function ModeSelectPane({
 
 export function ModeSelectScreen({ onSelectMode, quizEligibleCount }: ModeSelectScreenProps) {
   const quizDisabled = quizEligibleCount < 4;
+  const demo = useModeSelectMobileDemo(quizDisabled);
+
+  const shellClass =
+    "mode-select-shell" + (demo.isMobileDemo ? " mode-select-shell--mobile-demo" : "");
 
   return (
-    <main className="mode-select-shell">
+    <main className={shellClass}>
       <div className="mode-select-split">
         <ModeSelectPane
+          videoRef={demo.freestyleRef}
           videoSrc={MODE_SELECT_FREESTYLE_VIDEO}
           tint="green"
           title="Фристайл"
-          description="Угадываете вслух, ведущий открывает ответ — классический формат."
+          description="Вариант для игры в компании у большого экрана."
           onSelect={() => onSelectMode("freestyle")}
+          demoActive={demo.demoActiveFreestyle}
+          onVideoEnded={demo.onDemoEndedFreestyle}
         />
         <ModeSelectPane
+          videoRef={demo.quizRef}
           videoSrc={MODE_SELECT_QUIZ_VIDEO}
           tint="red"
           title="Викторина"
-          description="Четыре варианта, счёт правильных ответов и итоговый ролик по результату."
+          description="Вариант для игры в соло с мобилы."
           disabled={quizDisabled}
           disabledHint={`Нужно минимум 4 раунда с одной строкой ответа (сейчас ${quizEligibleCount}).`}
           onSelect={() => onSelectMode("quiz")}
+          demoActive={demo.demoActiveQuiz}
+          onVideoEnded={demo.onDemoEndedQuiz}
         />
       </div>
     </main>

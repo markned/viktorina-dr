@@ -430,28 +430,41 @@ body,
   min-height: 100dvh;
 }
 
-.intro-video-shell {
-  cursor: pointer;
-}
-
-.intro-skip-hint {
+.intro-skip-btn {
   position: fixed;
   left: 50%;
   bottom: max(16px, var(--safe-bottom));
   transform: translateX(-50%);
   z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
   margin: 0;
-  max-width: min(100% - 32px, 360px);
-  padding: 0 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
   box-sizing: border-box;
-  font-size: clamp(0.75rem, 2.2vw, 0.88rem);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: rgba(248, 251, 255, 0.82);
-  text-align: center;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-  user-select: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: filter 0.15s ease, transform 0.12s ease;
+}
+
+.intro-skip-btn:hover {
+  filter: brightness(1.08);
+}
+
+.intro-skip-btn:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+.intro-skip-btn-icon {
+  display: block;
+  margin-left: 2px;
 }
 
 /* Правила поверх квиза: те же отступы и flex, что у .rules-screen-shell — карточка того же размера */
@@ -1201,6 +1214,17 @@ body,
   z-index: 1;
 }
 
+/* Тач: автодемо — неактивная половина чуть тусклее */
+.mode-select-shell--mobile-demo .mode-select-pane:not(.mode-select-pane--demo-active):not(:disabled) {
+  opacity: 0.72;
+  transition: opacity 0.35s ease;
+}
+
+.mode-select-shell--mobile-demo .mode-select-pane--demo-active:not(:disabled) {
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
 .mode-select-split {
   display: flex;
   flex-direction: row;
@@ -1264,6 +1288,15 @@ body,
   .mode-select-pane:not(:disabled):hover .mode-select-pane__tint--red {
     background: rgba(160, 36, 52, 0.46);
   }
+}
+
+/* Тач: очередь автодемо — те же оттенки, что при ховере на десктопе */
+.mode-select-pane:not(:disabled).mode-select-pane--demo-active .mode-select-pane__tint--green {
+  background: rgba(24, 140, 82, 0.44);
+}
+
+.mode-select-pane:not(:disabled).mode-select-pane--demo-active .mode-select-pane__tint--red {
+  background: rgba(160, 36, 52, 0.46);
 }
 
 .mode-select-pane__content {
@@ -1620,46 +1653,45 @@ body,
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 10px 16px;
-  padding: 12px 16px 0;
+  gap: 12px 14px;
+  padding: 10px 16px 6px;
   font-size: 0.88rem;
   color: rgba(248, 251, 255, 0.75);
+  flex-shrink: 0;
 }
 
-.start-screen-author-label {
-  font-weight: 600;
-  margin-right: 4px;
-}
-
-.start-screen-author-link {
+.start-screen-author-icon-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: rgba(180, 210, 255, 0.95);
+  justify-content: center;
+  padding: 2px;
+  line-height: 0;
   text-decoration: none;
-  font-weight: 600;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(128, 151, 196, 0.35);
-  transition: background 0.15s, border-color 0.15s;
+  border-radius: 50%;
+  transition: opacity 0.22s ease, filter 0.22s ease;
+  opacity: 0.62;
 }
 
-.start-screen-author-link:hover {
-  background: rgba(91, 140, 255, 0.15);
-  border-color: rgba(91, 140, 255, 0.45);
+.start-screen-author-icon-link:hover {
+  opacity: 1;
 }
 
-.start-screen-author-icon {
-  font-size: 1rem;
+.start-screen-author-icon-link:active {
+  opacity: 0.88;
 }
 
-.start-screen-author-icon--ig {
-  font-size: 1.1rem;
+.start-screen-author-icon-link img {
+  display: block;
+  width: clamp(28px, 8vw, 36px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  transition: filter 0.22s ease;
 }
 
-.start-screen-author-handle {
-  font-size: 0.85rem;
+.start-screen-author-icon-link:hover img {
+  filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.55));
 }
 
 .game-pause-hints {

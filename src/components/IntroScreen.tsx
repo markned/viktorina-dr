@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useTripleActivation } from "../hooks/useTripleActivation";
 import { INTRO_VIDEO_PATH } from "../helpers/quizConfig";
 import { boostVolume } from "../lib/volumeBoost";
 
@@ -9,19 +7,6 @@ type IntroScreenProps = {
 };
 
 export function IntroScreen({ onVideoEnded, onSkip }: IntroScreenProps) {
-  const bumpTriple = useTripleActivation(onSkip);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code !== "Space" || e.repeat) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      e.preventDefault();
-      bumpTriple();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [bumpTriple]);
-
   const onPlay = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = e.currentTarget;
     video.muted = false;
@@ -29,7 +14,7 @@ export function IntroScreen({ onVideoEnded, onSkip }: IntroScreenProps) {
   };
 
   return (
-    <main className="app-shell intro-video-shell" onClick={bumpTriple}>
+    <main className="app-shell intro-video-shell">
       <video
         className="intro-outro-video intro-outro-foreground"
         src={INTRO_VIDEO_PATH}
@@ -39,7 +24,30 @@ export function IntroScreen({ onVideoEnded, onSkip }: IntroScreenProps) {
         onPlay={onPlay}
         onEnded={onVideoEnded}
       />
-      <p className="intro-skip-hint">Тройной тап или пробел — пропустить</p>
+      <button
+        type="button"
+        className="intro-skip-btn"
+        onClick={onSkip}
+        aria-label="Пропустить интро"
+      >
+        <svg
+          className="intro-skip-btn-icon"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden
+        >
+          <path
+            d="M5 12h14M13 6l6 6-6 6"
+            stroke="currentColor"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
     </main>
   );
 }
