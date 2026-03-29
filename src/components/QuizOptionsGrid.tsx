@@ -1,5 +1,16 @@
 import type { RoundState } from "../types";
 
+function optionLabel(text: string) {
+  const raw = text || "—";
+  const parts = raw.split("\n");
+  if (parts.length === 1) return raw;
+  return parts.map((part, j) => (
+    <span key={j} className="quiz-option-segment">
+      {part.length ? part : "\u00A0"}
+    </span>
+  ));
+}
+
 type QuizOptionsGridProps = {
   options: string[];
   selectedIndex: number | null;
@@ -49,7 +60,7 @@ export function QuizOptionsGrid({
               aria-pressed={!isFeedback && selectedIndex === i ? true : false}
               onClick={() => onSelect(i)}
             >
-              {text || "—"}
+              {optionLabel(text)}
             </button>
           );
         })}

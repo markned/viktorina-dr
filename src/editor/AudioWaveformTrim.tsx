@@ -9,6 +9,8 @@ type AudioWaveformTrimProps = {
   onRangeChange: (start: number, end: number) => void;
 };
 
+const TAIL_PREVIEW_SEC = 2.5;
+
 /** Локальная волна + жёлтая область как триммер (ползунки по краям региона) */
 export function AudioWaveformTrim({ audioUrl, start, end, onRangeChange }: AudioWaveformTrimProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,6 +28,16 @@ export function AudioWaveformTrim({ audioUrl, start, end, onRangeChange }: Audio
     if (d <= 0) return;
     const s = Math.min(start, d - 0.1);
     const e = Math.min(Math.max(end, s + 0.25), d);
+    void ws.play(s, e);
+  };
+
+  const playTail = () => {
+    const ws = wsRef.current;
+    if (!ws || !ready) return;
+    const d = dur || ws.getDuration();
+    if (d <= 0) return;
+    const e = Math.min(Math.max(end, start + 0.25), d);
+    const s = Math.max(0, e - TAIL_PREVIEW_SEC);
     void ws.play(s, e);
   };
 
@@ -136,6 +148,9 @@ export function AudioWaveformTrim({ audioUrl, start, end, onRangeChange }: Audio
         </button>
         <button type="button" className="editor-btn editor-btn--small" disabled={!ready} onClick={playFragment}>
           Фрагмент
+        </button>
+        <button type="button" className="editor-btn editor-btn--small" disabled={!ready} onClick={playTail} title="Последние ~2,5 с выбранного фрагмента">
+          Хвост
         </button>
         <span className="editor-waveform-toolbar-hint">Клик по волне — перемотка (drag to seek)</span>
       </div>

@@ -92,6 +92,7 @@ export default function App() {
         onToggle={game.toggleGamePause}
         touchMode={game.gesturePauseLayout}
         gameMode={game.gameMode}
+        quizUiVariant={game.quizUiVariant}
         onReturnToModeSelectRequest={() => game.setShowRestartConfirm(true)}
         onExitToStart={() => game.setShowExitConfirm(true)}
         onRulesRequest={() => game.setShowRulesOverlay(true)}
@@ -105,6 +106,9 @@ export default function App() {
           gameMode={game.gameMode}
           quizScore={game.quizScore}
           quizOptions={game.quizOptions}
+          quizUiVariant={game.quizUiVariant}
+          quizOrderUserIds={game.quizOrderUserIds}
+          onReorderQuizOrder={game.reorderQuizOrderLines}
           quizCorrectIndex={game.quizCorrectIndex}
           selectedQuizIndex={game.selectedQuizIndex}
           onSelectQuizOption={game.setQuizSelection}

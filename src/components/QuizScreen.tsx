@@ -1,8 +1,11 @@
+import type { QuizUiVariant } from "../helpers/quizOptions";
 import type { GameMode, LyricLine, Round, RoundState } from "../types";
 import { roundCounterEasterEggLabel } from "../helpers/roundCounterEasterEgg";
 import { Controls } from "./Controls";
 import { LyricsPanel } from "./LyricsPanel";
+import { QuizModeHint } from "./QuizModeHint";
 import { QuizOptionsGrid } from "./QuizOptionsGrid";
+import { QuizOrderLines } from "./QuizOrderLines";
 import { RevealPanel } from "./RevealPanel";
 import { Timer } from "./Timer";
 
@@ -14,6 +17,9 @@ type QuizScreenProps = {
   gameMode: GameMode | null;
   quizScore: number;
   quizOptions: string[];
+  quizUiVariant: QuizUiVariant | null;
+  quizOrderUserIds: number[];
+  onReorderQuizOrder: (ids: number[]) => void;
   quizCorrectIndex: number;
   selectedQuizIndex: number | null;
   onSelectQuizOption: (index: number) => void;
@@ -38,6 +44,9 @@ export function QuizScreen(props: QuizScreenProps) {
     gameMode,
     quizScore,
     quizOptions,
+    quizUiVariant,
+    quizOrderUserIds,
+    onReorderQuizOrder,
     quizCorrectIndex,
     selectedQuizIndex,
     onSelectQuizOption,
@@ -57,6 +66,11 @@ export function QuizScreen(props: QuizScreenProps) {
   const timerActive = roundState === "paused_for_guess";
   const showLyrics = roundState !== "transition";
   const counterLabel = roundCounterEasterEggLabel(round) ?? `${roundIndex + 1}/${totalRounds}`;
+  const lineText = (id: number) => round.lyrics.find((l) => l.id === id)?.text ?? "";
+  const quizHintVisible =
+    gameMode === "quiz" &&
+    quizUiVariant === "order" &&
+    (roundState === "playing" || roundState === "paused_for_guess");
 
   return (
     <div className="quiz-screen">
@@ -77,7 +91,16 @@ export function QuizScreen(props: QuizScreenProps) {
         {showLyrics ? (
           <>
             <h2 className="quiz-title">{round.title}</h2>
+            <QuizModeHint variant={quizUiVariant} visible={quizHintVisible} />
             <LyricsPanel hintLines={hintLines} visibleCount={visibleHintLineCount} />
+            <QuizOrderLines
+              roundState={roundState}
+              orderedIds={quizOrderUserIds}
+              lineText={lineText}
+              correctIds={round.revealLineIds}
+              disabled={gamePaused}
+              onReorder={onReorderQuizOrder}
+            />
             <QuizOptionsGrid
               options={quizOptions}
               selectedIndex={selectedQuizIndex}
@@ -93,6 +116,7 @@ export function QuizScreen(props: QuizScreenProps) {
       <Controls
         roundState={roundState}
         gameMode={gameMode}
+        quizUiVariant={quizUiVariant}
         selectedQuizIndex={selectedQuizIndex}
         onReplaySnippet={onReplaySnippet}
         onReveal={onReveal}

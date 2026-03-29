@@ -37,6 +37,20 @@ export async function uploadAudioToMusicFolder(file: File): Promise<string> {
   return j.filename ?? file.name;
 }
 
+export async function uploadVideoToBgFolder(file: File): Promise<string> {
+  const dataBase64 = await readFileAsBase64(file);
+  const res = await fetch("/api/editor/upload-video-bg", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: file.name, dataBase64 }),
+  });
+  const j = (await res.json()) as { ok?: boolean; relativePath?: string; error?: string };
+  if (!res.ok) {
+    throw new Error(j.error || res.statusText);
+  }
+  return j.relativePath ?? `bg/${file.name}`;
+}
+
 export async function deleteAudioFromMusicFolder(filename: string): Promise<void> {
   const res = await fetch("/api/editor/delete-audio", {
     method: "POST",
@@ -49,7 +63,9 @@ export async function deleteAudioFromMusicFolder(filename: string): Promise<void
   }
 }
 
-export type GitPushResult = { ok: true; noop?: boolean; message?: string } | { ok: false; error: string };
+export type GitPushResult =
+  | { ok: true; noop?: boolean; message?: string; pushedAt?: string }
+  | { ok: false; error: string };
 
 /** Только при `npm run dev`: git add → commit → push для rounds.ts и music/. */
 export async function pushDatabaseGit(roundsCount: number): Promise<GitPushResult> {
@@ -58,12 +74,18 @@ export async function pushDatabaseGit(roundsCount: number): Promise<GitPushResul
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ roundsCount }),
   });
-  const j = (await res.json()) as { ok?: boolean; noop?: boolean; message?: string; error?: string };
+  const j = (await res.json()) as {
+    ok?: boolean;
+    noop?: boolean;
+    message?: string;
+    pushedAt?: string;
+    error?: string;
+  };
   if (!res.ok) {
     return { ok: false, error: j.error || res.statusText };
   }
   if (j.noop) {
     return { ok: true, noop: true, message: j.message };
   }
-  return { ok: true };
+  return { ok: true, pushedAt: j.pushedAt };
 }

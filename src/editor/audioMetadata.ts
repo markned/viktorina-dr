@@ -1,5 +1,5 @@
 import { parseBlob } from "music-metadata";
-import { parseArtistTitleFromFilename } from "./editorUtils";
+import { parseArtistTitleFromFilename, stripFeatFromTrackTitle } from "./editorUtils";
 
 export type ArtistTitleFromTags = { artist?: string; title?: string };
 
@@ -38,9 +38,10 @@ export type GeniusSearchBuild = {
 export function buildGeniusSearchQuery(tags: ArtistTitleFromTags | null, filenameBase: string): GeniusSearchBuild | null {
   const base = filenameBase.trim();
   const fromFile = parseArtistTitleFromFilename(base);
+  const fileTitle = fromFile?.title ? stripFeatFromTrackTitle(fromFile.title) : undefined;
 
   const artist = tags?.artist?.trim();
-  const title = tags?.title?.trim();
+  const title = tags?.title?.trim() ? stripFeatFromTrackTitle(tags.title.trim()) : undefined;
 
   if (artist && title) {
     return { query: `${artist} ${title}`.replace(/\s+/g, " "), source: "metadata" };
@@ -48,14 +49,14 @@ export function buildGeniusSearchQuery(tags: ArtistTitleFromTags | null, filenam
   if (title) {
     return { query: title, source: "metadata" };
   }
-  if (artist && fromFile?.title) {
-    return { query: `${artist} ${fromFile.title}`.replace(/\s+/g, " "), source: "metadata" };
+  if (artist && fileTitle) {
+    return { query: `${artist} ${fileTitle}`.replace(/\s+/g, " "), source: "metadata" };
   }
   if (artist) {
     return { query: artist, source: "metadata" };
   }
-  if (fromFile) {
-    return { query: `${fromFile.artist} ${fromFile.title}`.replace(/\s+/g, " "), source: "filename" };
+  if (fromFile && fileTitle) {
+    return { query: `${fromFile.artist} ${fileTitle}`.replace(/\s+/g, " "), source: "filename" };
   }
   return null;
 }
@@ -66,9 +67,9 @@ export function pickRoundTitleFromTagsAndFilename(
   filenameBase: string,
 ): string | null {
   const t = tags?.title?.trim();
-  if (t) return t;
+  if (t) return stripFeatFromTrackTitle(t);
   const fromFile = parseArtistTitleFromFilename(filenameBase.trim());
-  if (fromFile?.title) return fromFile.title;
+  if (fromFile?.title) return stripFeatFromTrackTitle(fromFile.title);
   const b = filenameBase.trim();
-  return b.length > 0 ? b : null;
+  return b.length > 0 ? stripFeatFromTrackTitle(b) : null;
 }

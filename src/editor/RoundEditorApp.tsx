@@ -9,6 +9,7 @@ import {
   pushDatabaseGit,
   saveRoundsTsToWorkspace,
   uploadAudioToMusicFolder,
+  uploadVideoToBgFolder,
 } from "./editorApi";
 import {
   buildGeniusSearchQuery,
@@ -32,6 +33,24 @@ import {
   stashRoundForPreview,
 } from "./previewRoundStorage";
 
+const EDITOR_LAST_PUSH_KEY = "technique_quiz_editor_last_push";
+
+type LastPushMeta = { at: string; roundsCount: number };
+
+function readLastPushMeta(): LastPushMeta | null {
+  try {
+    const raw = localStorage.getItem(EDITOR_LAST_PUSH_KEY);
+    if (!raw) return null;
+    const j = JSON.parse(raw) as { at?: unknown; roundsCount?: unknown };
+    if (typeof j.at === "string" && typeof j.roundsCount === "number") {
+      return { at: j.at, roundsCount: j.roundsCount };
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
 export function RoundEditorApp() {
   const editorSnapshot = consumeEditorSnapshotForInitialState();
   const [rounds, setRounds] = useState<Round[]>(() =>
@@ -43,6 +62,9 @@ export function RoundEditorApp() {
   const [geniusStatus, setGeniusStatus] = useState<string | null>(null);
   const importJsonInputRef = useRef<HTMLInputElement>(null);
   const importExportDetailsRef = useRef<HTMLDetailsElement>(null);
+  const pushSuccessClearRef = useRef<number | null>(null);
+  const [pushUiState, setPushUiState] = useState<"idle" | "loading" | "success">("idle");
+  const [lastPushMeta, setLastPushMeta] = useState<LastPushMeta | null>(() => readLastPushMeta());
 
   const round = rounds[selectedIndex];
 
@@ -353,6 +375,14 @@ export function RoundEditorApp() {
     setSelectedIndex((i) => Math.max(0, i - 1));
   }, [round, selectedIndex]);
 
+  useEffect(() => {
+    return () => {
+      if (pushSuccessClearRef.current !== null) {
+        window.clearTimeout(pushSuccessClearRef.current);
+      }
+    };
+  }, []);
+
   const duplicateRound = useCallback(() => {
     if (!round) return;
     const newId = Math.max(0, ...rounds.map((r) => r.id)) + 1;
@@ -381,6 +411,10 @@ export function RoundEditorApp() {
         <p className="editor-hint">
           Сохранение в репозиторий работает при <code>npm run dev</code> (запись в <code>src/content/rounds/rounds.ts</code> и{" "}
           <code>public/content/audio/music/</code>).
+        </p>
+        <p className="editor-hint">
+          Викторина в игре: в пул попадают все раунды с непустым ответом. Одна или две строки — четыре варианта на выбор; три и больше —
+          расставьте строки в порядке.
         </p>
         <div className="editor-toolbar">
           <div className="editor-toolbar-cluster editor-toolbar-cluster--left">
@@ -466,33 +500,72 @@ export function RoundEditorApp() {
               Сохранить
             </button>
             {import.meta.env.DEV ? (
-              <button
-                type="button"
-                className="editor-btn"
-                onClick={() => {
-                  if (
-                    !confirm(
-                      "Выполнить git add, commit и push для rounds.ts, public/content/audio/music/, public/content/audio/ui/ и public/content/video/?",
-                    )
-                  )
-                    return;
-                  void (async () => {
-                    setGeniusStatus("Git: выполняется…");
-                    const result = await pushDatabaseGit(rounds.length);
-                    if (!result.ok) {
-                      setGeniusStatus(`Git: ошибка — ${result.error}`);
+              <div className="editor-push-wrap">
+                <button
+                  type="button"
+                  className={`editor-btn editor-push-btn ${pushUiState === "success" ? "editor-push-btn--success" : ""}`}
+                  disabled={pushUiState === "loading"}
+                  title="Commit + push базы"
+                  onClick={() => {
+                    if (
+                      !confirm(
+                        "Выполнить git add, commit и push для rounds.ts, public/content/audio/music/, public/content/audio/ui/ и public/content/video/?",
+                      )
+                    ) {
                       return;
                     }
-                    if (result.noop) {
-                      setGeniusStatus(`Git: ${result.message ?? "без изменений"}`);
-                      return;
-                    }
-                    setGeniusStatus("Git: push выполнен");
-                  })();
-                }}
-              >
-                Commit + push базы
-              </button>
+                    void (async () => {
+                      if (pushSuccessClearRef.current !== null) {
+                        window.clearTimeout(pushSuccessClearRef.current);
+                        pushSuccessClearRef.current = null;
+                      }
+                      setPushUiState("loading");
+                      setGeniusStatus("Git: выполняется…");
+                      const result = await pushDatabaseGit(rounds.length);
+                      if (!result.ok) {
+                        setPushUiState("idle");
+                        setGeniusStatus(`Git: ошибка — ${result.error}`);
+                        return;
+                      }
+                      if (result.noop) {
+                        setPushUiState("idle");
+                        setGeniusStatus(`Git: ${result.message ?? "без изменений"}`);
+                        return;
+                      }
+                      const at = result.pushedAt ?? new Date().toISOString();
+                      const meta: LastPushMeta = { at, roundsCount: rounds.length };
+                      try {
+                        localStorage.setItem(EDITOR_LAST_PUSH_KEY, JSON.stringify(meta));
+                      } catch {
+                        /* ignore */
+                      }
+                      setLastPushMeta(meta);
+                      setPushUiState("success");
+                      setGeniusStatus("Git: push выполнен");
+                      pushSuccessClearRef.current = window.setTimeout(() => {
+                        pushSuccessClearRef.current = null;
+                        setPushUiState("idle");
+                      }, 2400);
+                    })();
+                  }}
+                >
+                  {pushUiState === "loading" ? (
+                    <span className="editor-push-spin" aria-hidden />
+                  ) : pushUiState === "success" ? (
+                    <span aria-hidden>✓</span>
+                  ) : (
+                    <span aria-hidden>↑</span>
+                  )}
+                  <span className="editor-push-label">Push базы</span>
+                </button>
+                {lastPushMeta ? (
+                  <p className="editor-push-caption">
+                    Последний push: {new Date(lastPushMeta.at).toLocaleString()} · {lastPushMeta.roundsCount} треков
+                  </p>
+                ) : (
+                  <p className="editor-push-caption">В этом браузере ещё не было успешного push</p>
+                )}
+              </div>
             ) : null}
           </div>
         </div>
@@ -555,10 +628,10 @@ export function RoundEditorApp() {
                     start: 0,
                     end: 10,
                     lyrics: editorLinesToLyrics(
-                      "Подсказка (строки с номерами слева)\nОтвет — строки сразу после последней подсказки",
+                      "Подсказка (строки с номерами слева)\nПервая строка ответа\nВторая строка ответа",
                     ),
                     hintLineIds: [1],
-                    revealLineIds: [2],
+                    revealLineIds: [2, 3],
                   };
                   const next = [...prev, nr];
                   setSelectedIndex(next.length - 1);
@@ -628,7 +701,7 @@ export function RoundEditorApp() {
               />
             </label>
             <p className="editor-muted">
-              При загрузке с диска файл копируется в <code>public/content/audio/music/</code>. Волна и Play / «Фрагмент» — из этого файла или из локального превью до перезагрузки страницы.
+              При загрузке с диска файл копируется в <code>public/content/audio/music/</code> под безопасным именем (латиница, цифры, дефисы — без кириллицы и пробелов), чтобы трек стабильно открывался на сайте. Волна и Play / «Фрагмент» — из этого файла или из локального превью до перезагрузки страницы.
             </p>
             <label className="editor-btn editor-btn--file">
               Загрузить аудио (копия в music/)
@@ -682,14 +755,39 @@ export function RoundEditorApp() {
           <section className="editor-section">
             <h2>Фон видео (опционально)</h2>
             <p className="editor-muted">
-              Файл в <code>public/content/video/</code> (например <code>bg/bg_round_8.mp4</code>). Пустое поле — только фото
-              смены раунда.
+              Файл в <code>public/content/video/</code>, для фонов удобна папка <code>bg/</code> (например <code>bg/round_8.mp4</code>).
+              Загрузка с диска копирует файл в <code>public/content/video/bg/</code> и подставляет путь <code>bg/…</code>. Пустое поле —
+              только фото смены раунда.
             </p>
+            <label className="editor-btn editor-btn--file editor-btn--small">
+              Загрузить видео в bg/
+              <input
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+                hidden
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!f || !round) return;
+                  void (async () => {
+                    try {
+                      const rel = await uploadVideoToBgFolder(f);
+                      updateRound({
+                        backgroundVideo: { file: rel, start: round.backgroundVideo?.start ?? 0 },
+                      });
+                      setGeniusStatus(`Видео: public/content/video/${rel}`);
+                    } catch (err) {
+                      setGeniusStatus(`Ошибка загрузки видео: ${err instanceof Error ? err.message : String(err)}`);
+                    }
+                  })();
+                }}
+              />
+            </label>
             <label className="editor-field">
               <span>Имя файла видео</span>
               <input
                 type="text"
-                placeholder="bg/bg_round_8.mp4"
+                placeholder="bg/round_8.mp4"
                 value={round.backgroundVideo?.file ?? ""}
                 onChange={(e) => {
                   const file = e.target.value.trim();

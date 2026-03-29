@@ -2,12 +2,15 @@ import { execFileSync } from "node:child_process";
 import { existsSync, unlinkSync } from "node:fs";
 import type { IncomingMessage } from "node:http";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { basename, dirname, extname, join } from "node:path";
 import type { Plugin } from "vite";
+import { toSafeAudioFilename } from "../src/helpers/safeAudioFilename";
 
-function sanitizeAudioFilename(name: string): string {
+function sanitizeBgVideoBasename(name: string): string | null {
   const base = name.replace(/^.*[/\\]/, "").replace(/\.\./g, "");
-  if (!base || base.length > 220) return "track.m4a";
+  if (!base || base.length > 220) return null;
+  if (!/^[a-zA-Z0-9._-]+\.(mp4|webm|mov)$/i.test(base)) return null;
   return base;
 }
 
@@ -92,7 +95,7 @@ export function editorDevPlugin(): Plugin {
         if (url === "/api/editor/upload-audio" && req.method === "POST") {
           try {
             const body = (await readJsonBody(req)) as { filename?: string; dataBase64?: string };
-            const name = sanitizeAudioFilename(body.filename ?? "");
+            const name = toSafeAudioFilename(body.filename ?? "track.m4a", randomUUID());
             if (!body.dataBase64) {
               res.statusCode = 400;
               res.end(JSON.stringify({ error: "dataBase64 required" }));
@@ -117,11 +120,35 @@ export function editorDevPlugin(): Plugin {
         if (url === "/api/editor/delete-audio" && req.method === "POST") {
           try {
             const body = (await readJsonBody(req)) as { filename?: string };
-            const name = sanitizeAudioFilename(body.filename ?? "");
+            const name = (body.filename ?? "").replace(/^.*[/\\]/, "").replace(/\.\./g, "");
             const fp = join(server.config.root, "public/content/audio/music", name);
             await unlink(fp).catch(() => {});
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({ ok: true }));
+          } catch (e) {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }));
+          }
+          return;
+        }
+        if (url === "/api/editor/upload-video-bg" && req.method === "POST") {
+          try {
+            const body = (await readJsonBody(req)) as { filename?: string; dataBase64?: string };
+            const name = sanitizeBgVideoBasename(body.filename ?? "");
+            if (!name || !body.dataBase64) {
+              res.statusCode = 400;
+              res.end(JSON.stringify({ error: "filename (.mp4/.webm/.mov) and dataBase64 required" }));
+              return;
+            }
+            const dir = join(server.config.root, "public/content/video/bg");
+            await mkdir(dir, { recursive: true });
+            const buf = Buffer.from(body.dataBase64, "base64");
+            const abs = join(dir, name);
+            await writeFile(abs, buf);
+            const relativePath = `bg/${name}`;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ ok: true, relativePath }));
           } catch (e) {
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
@@ -135,6 +162,7 @@ export function editorDevPlugin(): Plugin {
             const n = typeof body.roundsCount === "number" && Number.isFinite(body.roundsCount) ? Math.floor(body.roundsCount) : 0;
             const root = server.config.root;
             const msg = `База: ${n} треков (rounds.ts, music/, ui/, video/)`;
+            const pushedAt = new Date().toISOString();
             execFileSync(
               "git",
               [
@@ -154,7 +182,7 @@ export function editorDevPlugin(): Plugin {
             execFileSync("git", ["commit", "-m", msg], { cwd: root, stdio: "pipe" });
             execFileSync("git", ["push"], { cwd: root, stdio: "pipe" });
             res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify({ ok: true }));
+            res.end(JSON.stringify({ ok: true, pushedAt }));
           } catch (e) {
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");

@@ -1,6 +1,7 @@
 import { assetUrl } from "../helpers/quizConfig";
 import { useCoarsePointer } from "../hooks/useCoarsePointer";
 import { useGesturePauseLayout } from "../hooks/useGesturePauseLayout";
+import type { QuizUiVariant } from "../helpers/quizOptions";
 import type { GameMode } from "../types";
 
 type GamePauseToggleProps = {
@@ -10,12 +11,19 @@ type GamePauseToggleProps = {
   /** Без кнопки: пауза жестом (два пальца) или пробел; при паузе — большая иконка */
   touchMode: boolean;
   gameMode: GameMode | null;
+  quizUiVariant: QuizUiVariant | null;
   onReturnToModeSelectRequest: () => void;
   onExitToStart: () => void;
   onRulesRequest: () => void;
 };
 
-function PauseHintsPanel({ gameMode }: { gameMode: GameMode | null }) {
+function PauseHintsPanel({
+  gameMode,
+  quizUiVariant,
+}: {
+  gameMode: GameMode | null;
+  quizUiVariant: QuizUiVariant | null;
+}) {
   const coarse = useCoarsePointer();
   const gesturePause = useGesturePauseLayout();
 
@@ -38,7 +46,11 @@ function PauseHintsPanel({ gameMode }: { gameMode: GameMode | null }) {
       {gameMode === "quiz" ? (
         <div className="game-pause-hint game-pause-hint--shake">
           <span className="game-pause-hint-anim" />
-          <span>Викторина: выбери из 4 — вариант, ✓ или пробел</span>
+          <span>
+            {quizUiVariant === "order"
+              ? "Викторина: порядок строк — перетащите или ✓ / пробел"
+              : "Викторина: выбери из 4 — вариант, ✓ или пробел"}
+          </span>
         </div>
       ) : (
         <div className="game-pause-hint game-pause-hint--shake">
@@ -56,6 +68,7 @@ export function GamePauseToggle({
   onToggle,
   touchMode,
   gameMode,
+  quizUiVariant,
   onReturnToModeSelectRequest,
   onExitToStart,
   onRulesRequest,
@@ -80,7 +93,7 @@ export function GamePauseToggle({
                 draggable={false}
               />
             </button>
-            <PauseHintsPanel gameMode={gameMode} />
+            <PauseHintsPanel gameMode={gameMode} quizUiVariant={quizUiVariant} />
             <div className="game-pause-menu">
               <button
                 type="button"

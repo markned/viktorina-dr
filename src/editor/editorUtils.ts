@@ -1,4 +1,5 @@
 import type { LyricLine, Round } from "../types";
+import { toSafeAudioFilename } from "../helpers/safeAudioFilename";
 
 /**
  * Подсказки — выбранные id; ответ — подряд идущие строки после max(подсказки), их число задаётся `answerLineCount`.
@@ -68,13 +69,9 @@ export function lyricsToText(lines: LyricLine[]): string {
   return lines.map((l) => l.text).join("\n");
 }
 
-/** Имя файла по названию трека (в `public/content/audio/music/`). */
+/** Имя файла по названию трека (в `public/content/audio/music/`) — только безопасные символы для URL. */
 export function defaultAudioFileForTitle(title: string): string {
-  const slug = title
-    .toLowerCase()
-    .replaceAll(/[^a-z0-9а-яё]+/gi, "-")
-    .replaceAll(/^-+|-+$/g, "");
-  return `${slug || "track"}.m4a`;
+  return toSafeAudioFilename(`${title.trim() || "track"}.m4a`, title);
 }
 
 /**
@@ -93,6 +90,16 @@ export function parseArtistTitleFromFilename(baseName: string): { artist: string
     return null;
   }
   return { artist, title };
+}
+
+/** Убирает хвосты вида «(feat. …)» / «[feat. …]» из названия для поиска и поля title. */
+export function stripFeatFromTrackTitle(s: string): string {
+  return s
+    .replace(/\s*\(\s*feat\.[^)]*\)/gi, "")
+    .replace(/\s*\[\s*feat\.[^\]]*\]/gi, "")
+    .replace(/\s*\(\s*ft\.[^)]*\)/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Оставляет только строки подсказок и ответа, перенумеровывает id подряд с 1. */

@@ -3,9 +3,10 @@ import { ReplayWithPlayIcon } from "./ReplayWithPlayIcon";
 import { useCoarsePointer } from "../hooks/useCoarsePointer";
 import { useDockFitScale } from "../hooks/useDockFitScale";
 import { useGesturePauseLayout } from "../hooks/useGesturePauseLayout";
+import type { QuizUiVariant } from "../helpers/quizOptions";
 import type { GameMode, RoundState } from "../types";
 
-function usePauseHintText(gameMode: GameMode | null): string {
+function usePauseHintText(gameMode: GameMode | null, quizVariant: QuizUiVariant | null): string {
   const coarse = useCoarsePointer();
   const gesturePause = useGesturePauseLayout();
   return useMemo(() => {
@@ -19,15 +20,19 @@ function usePauseHintText(gameMode: GameMode | null): string {
       return "Пауза — клавиша Esc";
     })();
     if (gameMode === "quiz") {
+      if (quizVariant === "order") {
+        return `${pause} · Викторина: порядок строк — перетащите или ↑↓, затем «✓» или пробел.`;
+      }
       return `${pause} · Викторина: выбери из 4 — вариант, «✓» или пробел.`;
     }
     return `${pause} · Фристайл: ответ вслух, затем пробел или 👁.`;
-  }, [gesturePause, coarse, gameMode]);
+  }, [gesturePause, coarse, gameMode, quizVariant]);
 }
 
 type ControlsProps = {
   roundState: RoundState;
   gameMode: GameMode | null;
+  quizUiVariant: QuizUiVariant | null;
   selectedQuizIndex: number | null;
   onReplaySnippet: () => void;
   onReveal: () => void;
@@ -38,6 +43,7 @@ type ControlsProps = {
 export function Controls({
   roundState,
   gameMode,
+  quizUiVariant,
   selectedQuizIndex,
   onReplaySnippet,
   onReveal,
@@ -46,12 +52,14 @@ export function Controls({
 }: ControlsProps) {
   const dockRef = useRef<HTMLElement>(null);
   useDockFitScale(dockRef);
-  const pauseHint = usePauseHintText(gameMode);
+  const pauseHint = usePauseHintText(gameMode, quizUiVariant);
 
   const isQuiz = gameMode === "quiz";
   const canRevealFreestyle = !isQuiz && roundState === "timer_finished";
   const canConfirmQuiz =
-    isQuiz && roundState === "paused_for_guess" && selectedQuizIndex !== null;
+    isQuiz &&
+    roundState === "paused_for_guess" &&
+    (quizUiVariant === "order" || selectedQuizIndex !== null);
   const canNext = roundState === "reveal";
   const canReplay = roundState !== "transition" && roundState !== "quiz_feedback";
 
@@ -74,12 +82,14 @@ export function Controls({
       <button
         className={`dock-btn dock-btn-primary ${canPrimary ? "" : "dock-btn-dimmed"}`}
         onClick={primaryAction}
-        disabled={isQuiz && roundState === "paused_for_guess" && selectedQuizIndex === null}
+        disabled={isQuiz && roundState === "paused_for_guess" && quizUiVariant !== "order" && selectedQuizIndex === null}
         title={
           isQuiz
             ? canConfirmQuiz
               ? "Подтвердить ответ (пробел)"
-              : "Сначала выберите вариант"
+              : quizUiVariant === "order"
+                ? "Подтвердить порядок (пробел)"
+                : "Сначала выберите вариант"
             : canRevealFreestyle
               ? "Открыть ответ (пробел)"
               : "Тройной клик или пробел — вскрыть ответ"

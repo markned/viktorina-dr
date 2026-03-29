@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { rounds as allRounds } from "../content/rounds";
 import { LocalMediaPlayer } from "../adapters/localMediaPlayer";
 import type { PlayerAdapter } from "../adapters/player";
@@ -7,7 +7,8 @@ import { useGesturePauseLayout } from "./useGesturePauseLayout";
 import { pickLyricLines } from "../helpers/lyrics";
 import { getYouTubeEmbedUrl, toLocalMediaUrl } from "../helpers/media";
 import { buildQuizEligiblePool, buildQuizSessionPlayOrder } from "../helpers/quizMode";
-import { buildQuizOptions } from "../helpers/quizOptions";
+import { buildQuizMcOptions, getQuizUiVariant, type QuizUiVariant } from "../helpers/quizOptions";
+import { shuffle } from "../helpers/shuffle";
 import { buildSessionPlayOrder } from "../helpers/quizOrder";
 import { buildBackgroundPhotoSequence } from "../helpers/backgroundPhotos";
 import {
@@ -107,6 +108,8 @@ export function useQuizGame() {
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
   const [quizScore, setQuizScore] = useState(0);
   const [quizOptions, setQuizOptions] = useState<string[]>([]);
+  const [quizUiVariant, setQuizUiVariant] = useState<QuizUiVariant | null>(null);
+  const [quizOrderUserIds, setQuizOrderUserIds] = useState<number[]>([]);
   const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
   const [upcomingRoundTitle, setUpcomingRoundTitle] = useState<string>(() => previewRound?.title ?? "");
   const [visibleHintLineCount, setVisibleHintLineCount] = useState(0);
@@ -129,6 +132,8 @@ export function useQuizGame() {
   const gamePausedRef = useRef(false);
   const quizCorrectIndexRef = useRef(0);
   const selectedQuizIndexRef = useRef<number | null>(null);
+  const quizUiVariantRef = useRef<QuizUiVariant | null>(null);
+  const quizOrderUserIdsRef = useRef<number[]>([]);
   const quizDistractorPoolRef = useRef<Round[]>([]);
   const quizFeedbackTimeoutRef = useRef<number | null>(null);
   const [quizCorrectIndex, setQuizCorrectIndex] = useState(0);
@@ -143,6 +148,8 @@ export function useQuizGame() {
   timerSecondsRef.current = timerSeconds;
   gamePausedRef.current = gamePaused;
   selectedQuizIndexRef.current = selectedQuizIndex;
+  quizUiVariantRef.current = quizUiVariant;
+  quizOrderUserIdsRef.current = quizOrderUserIds;
 
   const [playOrder, setPlayOrder] = useState<Round[]>(() => {
     const inline = tryParseInlinePreviewRound();
@@ -262,9 +269,20 @@ export function useQuizGame() {
   };
 
   const finalizeQuizRound = () => {
-    const selected = selectedQuizIndexRef.current;
-    const correctIdx = quizCorrectIndexRef.current;
-    const isCorrect = selected !== null && selected === correctIdx;
+    const r = orderedRoundsRef.current[roundIndexRef.current];
+    const variant = quizUiVariantRef.current;
+    let isCorrect = false;
+    if (variant === "order" && r) {
+      const order = quizOrderUserIdsRef.current;
+      const reveal = r.revealLineIds;
+      isCorrect = order.length === reveal.length && order.every((id, i) => id === reveal[i]);
+    } else if (variant === "mc4") {
+      const selected = selectedQuizIndexRef.current;
+      const correctIdx = quizCorrectIndexRef.current;
+      isCorrect = selected !== null && selected === correctIdx;
+    } else {
+      isCorrect = false;
+    }
     if (isCorrect) {
       setQuizScore((s) => s + 1);
     }
@@ -356,14 +374,39 @@ export function useQuizGame() {
     setVisibleHintLineCount(0);
     setRoundState("playing");
     if (gameModeRef.current === "quiz") {
-      const built = buildQuizOptions(r, quizDistractorPoolRef.current);
-      quizCorrectIndexRef.current = built.correctIndex;
-      setQuizCorrectIndex(built.correctIndex);
-      setQuizOptions(built.options);
-      setSelectedQuizIndex(null);
+      const v = getQuizUiVariant(r);
+      setQuizUiVariant(v);
+      if (v === "mc4") {
+        const built = buildQuizMcOptions(r, quizDistractorPoolRef.current);
+        quizCorrectIndexRef.current = built.correctIndex;
+        setQuizCorrectIndex(built.correctIndex);
+        setQuizOptions(built.options);
+        setSelectedQuizIndex(null);
+        setQuizOrderUserIds([]);
+      } else if (v === "order") {
+        quizCorrectIndexRef.current = 0;
+        setQuizCorrectIndex(0);
+        setQuizOptions([]);
+        setSelectedQuizIndex(null);
+        const ids = r.revealLineIds;
+        let shuffled = shuffle([...ids]);
+        let tries = 0;
+        while (tries < 40 && ids.length === shuffled.length && ids.every((id, i) => id === shuffled[i])) {
+          shuffled = shuffle([...ids]);
+          tries += 1;
+        }
+        setQuizOrderUserIds(shuffled);
+      } else {
+        setQuizOptions([]);
+        setSelectedQuizIndex(null);
+        setQuizOrderUserIds([]);
+        setQuizCorrectIndex(0);
+      }
     } else {
+      setQuizUiVariant(null);
       setQuizOptions([]);
       setSelectedQuizIndex(null);
+      setQuizOrderUserIds([]);
       setQuizCorrectIndex(0);
     }
 
@@ -547,7 +590,7 @@ export function useQuizGame() {
     }
     setVisibleHintLineCount(0);
     stopCountdown();
-    if (gameModeRef.current === "quiz") {
+    if (gameModeRef.current === "quiz" && quizUiVariantRef.current === "mc4") {
       setSelectedQuizIndex(null);
     }
     setRoundState("playing");
@@ -568,7 +611,7 @@ export function useQuizGame() {
     if (roundStateRef.current !== "paused_for_guess") {
       return;
     }
-    if (selectedQuizIndexRef.current === null) {
+    if (quizUiVariantRef.current === "mc4" && selectedQuizIndexRef.current === null) {
       return;
     }
     stopCountdown();
@@ -798,6 +841,8 @@ export function useQuizGame() {
     setGameMode(null);
     setQuizScore(0);
     setQuizOptions([]);
+    setQuizUiVariant(null);
+    setQuizOrderUserIds([]);
     setSelectedQuizIndex(null);
     setQuizCorrectIndex(0);
     setRoundState("intro");
@@ -821,6 +866,8 @@ export function useQuizGame() {
     resetHiddenRevealTap();
     setQuizScore(0);
     setQuizOptions([]);
+    setQuizUiVariant(null);
+    setQuizOrderUserIds([]);
     setSelectedQuizIndex(null);
     setQuizCorrectIndex(0);
     setTimerSeconds(60);
@@ -848,6 +895,12 @@ export function useQuizGame() {
     if (roundStateRef.current !== "paused_for_guess") return;
     setSelectedQuizIndex(index);
   };
+
+  const reorderQuizOrderLines = useCallback((ids: number[]) => {
+    if (gameModeRef.current !== "quiz") return;
+    if (roundStateRef.current !== "paused_for_guess") return;
+    setQuizOrderUserIds(ids);
+  }, []);
 
   return {
     roundState,
@@ -887,6 +940,9 @@ export function useQuizGame() {
     gameMode,
     quizScore,
     quizOptions,
+    quizUiVariant,
+    quizOrderUserIds,
+    reorderQuizOrderLines,
     quizCorrectIndex,
     selectedQuizIndex,
     setQuizSelection,

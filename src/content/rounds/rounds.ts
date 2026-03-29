@@ -5,7 +5,7 @@ export const rounds: Round[] = [
   {
     id: 1,
     title: "Черная дыра",
-    audioFile: "Черная дыра.m4a",
+    audioFile: "chernaya-dyra-a97c7b46.m4a",
     start: 21,
     end: 30.25,
     lyrics: [
@@ -21,7 +21,7 @@ export const rounds: Round[] = [
   {
     id: 2,
     title: "В аквапарке",
-    audioFile: "В аквапарке.m4a",
+    audioFile: "v-akvaparke-b33301b7.m4a",
     start: 23,
     end: 29,
     lyrics: [
@@ -36,7 +36,7 @@ export const rounds: Round[] = [
   {
     id: 3,
     title: "Ебу закон",
-    audioFile: "Ебу закон.m4a",
+    audioFile: "ebu-zakon-69cd5658.m4a",
     start: 12,
     end: 20.5,
     lyrics: [
@@ -51,7 +51,7 @@ export const rounds: Round[] = [
   {
     id: 4,
     title: "Ебу закон",
-    audioFile: "Ебу закон.m4a",
+    audioFile: "ebu-zakon-69cd5658.m4a",
     start: 34.5,
     end: 45.5,
     lyrics: [
@@ -68,7 +68,7 @@ export const rounds: Round[] = [
   {
     id: 5,
     title: "Море или океан",
-    audioFile: "Море или океан.m4a",
+    audioFile: "more-ili-okean-92ad9d39.m4a",
     start: 109.5,
     end: 119,
     lyrics: [
@@ -85,7 +85,7 @@ export const rounds: Round[] = [
   {
     id: 6,
     title: "Гитлер",
-    audioFile: "Гитлер.m4a",
+    audioFile: "gitler-18b67f8a.m4a",
     start: 81.5,
     end: 89.5,
     lyrics: [
@@ -101,7 +101,7 @@ export const rounds: Round[] = [
   {
     id: 7,
     title: "Это жизнь",
-    audioFile: "Это жизнь.m4a",
+    audioFile: "eto-zhizn-02a7de08.m4a",
     start: 3,
     end: 6,
     lyrics: [
@@ -118,7 +118,7 @@ export const rounds: Round[] = [
   {
     id: 8,
     title: "Не прут колеса",
-    audioFile: "Не прут колеса.m4a",
+    audioFile: "ne-prut-kolesa-86d5711e.m4a",
     backgroundVideo: {
       file: "bg/bg_round_8.mp4",
       start: 84,
@@ -138,7 +138,7 @@ export const rounds: Round[] = [
   {
     id: 9,
     title: "За кем стоит андеграунд",
-    audioFile: "За кем стоит Андерграунд.m4a",
+    audioFile: "za-kem-stoit-andergraund-1456eda1.m4a",
     backgroundVideo: {
       file: "bg/bg_round_9.mp4",
       start: 30,
@@ -159,7 +159,7 @@ export const rounds: Round[] = [
   {
     id: 10,
     title: "Заебись",
-    audioFile: "Заебись.m4a",
+    audioFile: "zaebis-4e8375f7.m4a",
     start: 77,
     end: 85,
     lyrics: [
@@ -174,7 +174,7 @@ export const rounds: Round[] = [
   {
     id: 11,
     title: "Блевбургер",
-    audioFile: "Блевбургер.m4a",
+    audioFile: "blevburger-e34fa2a8.m4a",
     start: 0,
     end: 3.5,
     lyrics: [
@@ -189,7 +189,7 @@ export const rounds: Round[] = [
   {
     id: 12,
     title: "Черная дыра",
-    audioFile: "Черная дыра.m4a",
+    audioFile: "chernaya-dyra-a97c7b46.m4a",
     start: 86.5,
     end: 98.5,
     lyrics: [
@@ -207,7 +207,7 @@ export const rounds: Round[] = [
   {
     id: 13,
     title: "Короткая песенка",
-    audioFile: "Короткая песенка.m4a",
+    audioFile: "korotkaya-pesenka-e599d29b.m4a",
     start: 36,
     end: 45,
     lyrics: [
@@ -223,7 +223,7 @@ export const rounds: Round[] = [
   {
     id: 14,
     title: "Демоны",
-    audioFile: "Демоны.m4a",
+    audioFile: "demony-79a26b8a.m4a",
     start: 35,
     end: 39.5,
     lyrics: [
@@ -238,7 +238,7 @@ export const rounds: Round[] = [
   {
     id: 15,
     title: "Лошок",
-    audioFile: "27. Лошок.m4a",
+    audioFile: "27-loshok-d0490c0d.m4a",
     start: 53.61,
     end: 64.59,
     lyrics: [
@@ -254,7 +254,7 @@ export const rounds: Round[] = [
   {
     id: 16,
     title: "Кассир",
-    audioFile: "16. Кассир.m4a",
+    audioFile: "16-kassir-7f67a51a.m4a",
     start: 117.12,
     end: 123.92,
     lyrics: [
@@ -269,7 +269,7 @@ export const rounds: Round[] = [
   {
     id: 17,
     title: "Тубик",
-    audioFile: "Тубик.m4a",
+    audioFile: "tubik-60f6d765.m4a",
     start: 140.62,
     end: 147.25,
     lyrics: [
@@ -284,7 +284,7 @@ export const rounds: Round[] = [
   {
     id: 18,
     title: "История короче длинная",
-    audioFile: "23. История короче длинная.m4a",
+    audioFile: "23-istoriya-koroche-dlinnaya-7f421864.m4a",
     start: 144.77,
     end: 155.4,
     lyrics: [
@@ -300,7 +300,7 @@ export const rounds: Round[] = [
   {
     id: 19,
     title: "Ахуенно кого-нибудь убить",
-    audioFile: "02 - Ахуенно кого-нибудь убить ( feat. The Chemodan clan ).m4a",
+    audioFile: "02-ahuenno-kogo-nibud-ubit-feat-the-chemodan-clan-1dbc8735.m4a",
     start: 104.6351361702128,
     end: 113.11,
     lyrics: [
@@ -316,7 +316,7 @@ export const rounds: Round[] = [
   {
     id: 20,
     title: "Спасает параноя",
-    audioFile: "18. Спасает параноя.m4a",
+    audioFile: "18-spasaet-paranoya-f6aa067f.m4a",
     start: 163.07,
     end: 171.38,
     lyrics: [
@@ -332,7 +332,7 @@ export const rounds: Round[] = [
   {
     id: 21,
     title: "5 Лет",
-    audioFile: "09. 5 Лет.m4a",
+    audioFile: "09-5-let-9cd4846f.m4a",
     start: 85.14602943218095,
     end: 92.96286009301689,
     lyrics: [
@@ -348,7 +348,7 @@ export const rounds: Round[] = [
   {
     id: 22,
     title: "В Гавно",
-    audioFile: "03. В Гавно.m4a",
+    audioFile: "03-v-gavno-92d0bac6.m4a",
     start: 197.1868725664605,
     end: 204.7686202663463,
     lyrics: [
@@ -363,7 +363,7 @@ export const rounds: Round[] = [
   {
     id: 23,
     title: "Пиской Трясёт",
-    audioFile: "07. Пиской Трясёт.m4a",
+    audioFile: "07-piskoi-tryase-t-2ea59f23.m4a",
     start: 39.161316725127534,
     end: 44.417161670918325,
     lyrics: [
@@ -378,7 +378,7 @@ export const rounds: Round[] = [
   {
     id: 24,
     title: "Клитор",
-    audioFile: "22. Клитор.m4a",
+    audioFile: "22-klitor-93ecb072.m4a",
     start: 169.73,
     end: 180.87,
     lyrics: [
@@ -394,7 +394,7 @@ export const rounds: Round[] = [
   {
     id: 25,
     title: "Буду хулиганом",
-    audioFile: "16. Буду хулиганом (Feat. Иосан Масса & Даня Шарап).m4a",
+    audioFile: "16-budu-huliganom-feat-iosan-massa-danya-sharap-2a09ad9a.m4a",
     start: 203.2,
     end: 214.6,
     lyrics: [
@@ -411,7 +411,7 @@ export const rounds: Round[] = [
   {
     id: 26,
     title: "18:45:54",
-    audioFile: "07. 184554.m4a",
+    audioFile: "07-184554-eb81ccd3.m4a",
     start: 86.14,
     end: 96.4,
     lyrics: [
@@ -426,7 +426,7 @@ export const rounds: Round[] = [
   {
     id: 27,
     title: "Пидерсии ",
-    audioFile: "21. Пидерсии (Feat. Slimus, Сладкоежка, RJB & Ларик Сурапов).m4a",
+    audioFile: "21-pidersii-feat-slimus-sladkoezhka-rjb-larik-surapov-e71de63c.m4a",
     start: 5.120145148026313,
     end: 15.5,
     lyrics: [
@@ -442,7 +442,7 @@ export const rounds: Round[] = [
   {
     id: 28,
     title: "Руны",
-    audioFile: "04. Руны (Feat. Mc Кальмар).m4a",
+    audioFile: "04-runy-feat-mc-kalmar-79561da0.m4a",
     start: 152.3,
     end: 159,
     lyrics: [
@@ -458,7 +458,7 @@ export const rounds: Round[] = [
   {
     id: 29,
     title: "Руны",
-    audioFile: "04. Руны (Feat. Mc Кальмар).m4a",
+    audioFile: "04-runy-feat-mc-kalmar-79561da0.m4a",
     start: 182.4,
     end: 195.4,
     lyrics: [
@@ -474,7 +474,7 @@ export const rounds: Round[] = [
   {
     id: 30,
     title: "Сделал закладку",
-    audioFile: "09. Сделал закладку (Feat. Дубби Ду).m4a",
+    audioFile: "09-sdelal-zakladku-feat-dubbi-du-eb6fdca0.m4a",
     start: 75,
     end: 80.8,
     lyrics: [
@@ -489,7 +489,7 @@ export const rounds: Round[] = [
   {
     id: 31,
     title: "Соли",
-    audioFile: "15. Соли.m4a",
+    audioFile: "15-soli-299f2f03.m4a",
     start: 130.57719572368416,
     end: 140.13052631578955,
     lyrics: [
@@ -504,7 +504,7 @@ export const rounds: Round[] = [
   {
     id: 32,
     title: "Ольга Марковна",
-    audioFile: "12. Ольга Марковна.m4a",
+    audioFile: "12-olga-markovna-3e3f34a7.m4a",
     start: 131.7,
     end: 140.8,
     lyrics: [
@@ -520,7 +520,7 @@ export const rounds: Round[] = [
   {
     id: 33,
     title: "Побудь Со Мной",
-    audioFile: "24. Побудь Со Мной.m4a",
+    audioFile: "24-pobud-so-mnoi-2ef9e23c.m4a",
     start: 6.106304836827003,
     end: 12.1,
     lyrics: [
@@ -534,8 +534,8 @@ export const rounds: Round[] = [
   },
   {
     id: 34,
-    title: "Побудь Со Мной (копия)",
-    audioFile: "24. Побудь Со Мной.m4a",
+    title: "Побудь Со Мной",
+    audioFile: "24-pobud-so-mnoi-2ef9e23c.m4a",
     start: 94.7,
     end: 101.7,
     lyrics: [
@@ -551,7 +551,7 @@ export const rounds: Round[] = [
   {
     id: 35,
     title: "Гул Гул Гул",
-    audioFile: "22. Гул Гул Гул.m4a",
+    audioFile: "22-gul-gul-gul-1442c7fc.m4a",
     start: 137.55,
     end: 144.8,
     lyrics: [
@@ -566,7 +566,7 @@ export const rounds: Round[] = [
   {
     id: 36,
     title: "Мой Срок Кончается",
-    audioFile: "12. Мой Срок Кончается.m4a",
+    audioFile: "12-moi-srok-konchaetsya-6f45d6a4.m4a",
     start: 70.42362848415661,
     end: 78.74635594454864,
     lyrics: [
@@ -577,5 +577,57 @@ export const rounds: Round[] = [
     ],
     hintLineIds: [1, 2, 3],
     revealLineIds: [4],
+  },
+  {
+    id: 37,
+    title: "Хочешь быть сильным",
+    audioFile: "kunteynir-ty-hochesh-byt-silnym-55b743b5.m4a",
+    backgroundVideo: {
+      file: "bg/wannabestrong.mp4",
+      start: 20,
+    },
+    start: 51.52705690965695,
+    end: 57.4,
+    lyrics: [
+      { id: 1, text: "А ты попал в даун-таун, прошла двушка — нокдаун" },
+      { id: 2, text: "Девушка квакает под спайсом" },
+      { id: 3, text: "А я ебу тебя через Нью-Йорк;" },
+      { id: 4, text: "А он через неё, хуй с штанов достаёт" },
+    ],
+    hintLineIds: [1, 2, 3],
+    revealLineIds: [4],
+  },
+  {
+    id: 38,
+    title: "Я ебал в рот",
+    audioFile: "02-pasha-tehnik-ya-exxl-v-rot-prod-by-fd-vadim-b2889d77.m4a",
+    backgroundVideo: {
+      file: "bg/yaebal.mp4",
+      start: 25,
+    },
+    start: 3.0209452201933393,
+    end: 5.104558270676684,
+    lyrics: [
+      { id: 1, text: "Я ебал в рот" },
+      { id: 2, text: "Тех, кто не ебал в рот тех, кто ебал в жопу" },
+    ],
+    hintLineIds: [1],
+    revealLineIds: [2],
+  },
+  {
+    id: 39,
+    title: "Спартанский жим",
+    audioFile: "06-metox-pasha-tehnik-raskolnikov-spartanskii-zhim-551df03d.m4a",
+    start: 198.8,
+    end: 209.7,
+    lyrics: [
+      { id: 1, text: "Спартанский жим нагишом, мы делаем шоу" },
+      { id: 2, text: "Янг Траппа далеко зашёл" },
+      { id: 3, text: "Нам то это всё за шо? С нами Сашок" },
+      { id: 4, text: "Мы на спорте будто бы выпускники СДЮСШОР" },
+      { id: 5, text: "Если уж лев — против, то я тигр — за" },
+    ],
+    hintLineIds: [1, 2, 3, 4],
+    revealLineIds: [5],
   },
 ];

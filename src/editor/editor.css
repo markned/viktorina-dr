@@ -623,3 +623,48 @@
   font-size: 0.82rem;
   color: rgba(248, 251, 255, 0.55);
 }
+
+.editor-push-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.editor-push-btn {
+  gap: 8px;
+}
+
+.editor-push-btn--success {
+  border-color: rgba(72, 180, 120, 0.55);
+  color: #c8f5d8;
+}
+
+.editor-push-spin {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-top-color: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  animation: editor-spin 0.75s linear infinite;
+}
+
+@keyframes editor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.editor-push-caption {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(248, 251, 255, 0.55);
+  max-width: 260px;
+  text-align: right;
+  line-height: 1.35;
+}
+
+.editor-push-label {
+  font-size: 0.88rem;
+}

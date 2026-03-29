@@ -126,9 +126,9 @@ export function ModeSelectScreen({ onSelectMode, quizEligibleCount }: ModeSelect
           videoSrc={MODE_SELECT_QUIZ_VIDEO}
           tint="red"
           title="Викторина"
-          description="Выбери из 4"
+          description="Выбери ответ"
           disabled={quizDisabled}
-          disabledHint={`Нужно минимум 4 раунда с одной строкой ответа (сейчас ${quizEligibleCount}).`}
+          disabledHint={`Нужно минимум 4 раунда с ответом хотя бы из одной строки (сейчас ${quizEligibleCount}).`}
           onSelect={() => onSelectMode("quiz")}
           demoActive={demo.demoActiveQuiz}
           onVideoEnded={demo.onDemoEndedQuiz}
