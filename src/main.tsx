@@ -1,10 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { initAnalytics } from "./analytics";
 import { registerGlobalAudioUnlock } from "./lib/audioUnlock";
 import "./styles.css";
 
-initAnalytics();
 registerGlobalAudioUnlock();
 
 async function bootstrap() {
