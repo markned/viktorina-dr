@@ -630,4 +630,23 @@ export const rounds: Round[] = [
     hintLineIds: [1, 2, 3, 4],
     revealLineIds: [5],
   },
+  {
+    id: 40,
+    title: "Нужен Xanax",
+    audioFile: "06-pasha-tehnik-nuzhen-xanax-14ab85f2.m4a",
+    backgroundVideo: {
+      file: "bg/xanax.mp4",
+      start: 26,
+    },
+    start: 33.3,
+    end: 39.5,
+    lyrics: [
+      { id: 1, text: "Слава Кастору Трою" },
+      { id: 2, text: "Одеялом теплым тебя накрою" },
+      { id: 3, text: "Когда не пою, меня кроет" },
+      { id: 4, text: "Обожаю мясо с кровью, кровью" },
+    ],
+    hintLineIds: [1, 2, 3],
+    revealLineIds: [4],
+  },
 ];

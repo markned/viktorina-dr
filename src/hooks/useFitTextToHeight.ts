@@ -13,7 +13,7 @@ type UseFitTextToHeightOptions = {
 export function useFitTextToHeight(options: UseFitTextToHeightOptions = {}) {
   const { maxPx = 44, floorMinPx = 8 } = options;
   const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLPreElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const container = containerRef.current;

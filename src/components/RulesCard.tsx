@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { useFitTextToHeight } from "../hooks/useFitTextToHeight";
-import { GAME_RULES_COMMON } from "../content/rules";
+import { GameRulesCommon } from "../content/rules";
 import { RULES_AUDIO_DELAY_MS } from "../helpers/quizConfig";
 import type { GameMode } from "../types";
 import { whenAudioUnlocked } from "../lib/audioUnlock";
@@ -10,8 +10,8 @@ type RulesCardProps = {
   footer: ReactNode;
   /** Озвучка `audioSrc` (по умолчанию выключена — общий экран без автозвука) */
   playAudio?: boolean;
-  /** Текст правил (по умолчанию фристайл) */
-  rulesText?: string;
+  /** Текст правил (по умолчанию общие правила с подсказками по режимам) */
+  rulesContent?: ReactNode;
   /** Заголовок карточки */
   rulesTitle?: string;
   /** Путь к озвучке (нужен, если `playAudio`) */
@@ -24,7 +24,7 @@ type RulesCardProps = {
 export function RulesCard({
   footer,
   playAudio = false,
-  rulesText = GAME_RULES_COMMON,
+  rulesContent = <GameRulesCommon />,
   rulesTitle = "Правила игры",
   audioSrc,
   mode = "freestyle",
@@ -75,9 +75,9 @@ export function RulesCard({
         {rulesTitle}
       </h2>
       <div ref={containerRef} className="rules-screen-body">
-        <pre ref={textRef} className="rules-screen-text" data-rules-mode={mode}>
-          {rulesText}
-        </pre>
+        <div ref={textRef} className="rules-screen-text" data-rules-mode={mode}>
+          {rulesContent}
+        </div>
       </div>
       {footer}
     </div>

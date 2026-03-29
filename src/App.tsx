@@ -3,6 +3,7 @@ import { GameRulesScreen } from "./components/GameRulesScreen";
 import { ModeSelectScreen } from "./components/ModeSelectScreen";
 import { OutroScreen } from "./components/OutroScreen";
 import { GamePauseToggle } from "./components/GamePauseToggle";
+import { DockChromaKeyLayer } from "./components/DockChromaKeyLayer";
 import { QuizBackground } from "./components/QuizBackground";
 import { QuizScreen } from "./components/QuizScreen";
 import { ExitConfirmDialog } from "./components/ExitConfirmDialog";
@@ -86,6 +87,7 @@ export default function App() {
         videoSrc={game.roundVideoBackgroundUrl}
         videoStartSec={game.roundVideoBackgroundStart}
       />
+      <DockChromaKeyLayer />
       <GamePauseToggle
         paused={game.gamePaused}
         disabled={game.roundState === "transition" || game.roundState === "quiz_feedback"}

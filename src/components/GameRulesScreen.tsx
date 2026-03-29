@@ -1,4 +1,3 @@
-import { GAME_RULES_COMMON } from "../content/rules";
 import { RulesCard } from "./RulesCard";
 
 type GameRulesScreenProps = {
@@ -12,7 +11,6 @@ export function GameRulesScreen({ onComplete }: GameRulesScreenProps) {
       <RulesCard
         mode="common"
         rulesTitle="Об игре"
-        rulesText={GAME_RULES_COMMON}
         playAudio={false}
         footer={
           <div className="rules-screen-start-wrap">

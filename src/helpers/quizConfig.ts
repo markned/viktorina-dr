@@ -61,6 +61,8 @@ export const INTRO_VIDEO_PATH = assetUrl("/content/video/ui/intro.mp4");
 /** Фон половин экрана выбора режима — `public/content/video/ui/` */
 export const MODE_SELECT_FREESTYLE_VIDEO = assetUrl("/content/video/ui/freestyleMenu.mp4");
 export const MODE_SELECT_QUIZ_VIDEO = assetUrl("/content/video/ui/quizMenu.mp4");
+/** Greenscreen-ролик над панелью управления (хромакей в WebGL), `public/content/video/ui/dock-chroma.mp4` */
+export const DOCK_UI_CHROMA_VIDEO = assetUrl("/content/video/ui/dock-chroma.mp4");
 export const OUTRO_VIDEO_PATH = assetUrl("/content/video/ui/outro.mp4");
 
 /** Финальные ролики викторины — `public/content/video/quiz/` */

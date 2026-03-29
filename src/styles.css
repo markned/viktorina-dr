@@ -568,6 +568,11 @@ video.youtube-bg.quiz-bg-video {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Экран «Управление»: без прокрутки, кегль как у карточки правил (useFitTextToHeight) */
+.rules-screen-shell .rules-screen-body.controls-screen-body {
+  overflow: hidden;
+}
+
 .controls-hint-list--in-rules {
   margin: 0;
   padding: 0 0 6px;
@@ -576,8 +581,47 @@ video.youtube-bg.quiz-bg-video {
   list-style: none;
 }
 
-.controls-screen-card .controls-hint-item {
+.rules-screen-text--controls {
+  white-space: normal;
+}
+
+/* Подсказки по управлению — тот же кегль/цвет/интерлиньяж, что у основного текста правил; бейджи — как .rules-screen-text-hint */
+.rules-screen-text--controls .controls-hint-list {
+  gap: 0.65em;
+}
+
+.rules-screen-text--controls .controls-hint-item {
+  font-size: inherit;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: #c8daf4;
+  gap: 0.55em;
   align-items: flex-start;
+}
+
+.rules-screen-text--controls .controls-hint-kbd {
+  flex-shrink: 0;
+  min-width: 2.5em;
+  padding: 0.28em 0.5em;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.78em;
+  line-height: 1.35;
+  color: rgba(200, 218, 244, 0.95);
+}
+
+.rules-screen-text--controls .controls-hint-item--pulse .controls-hint-kbd {
+  animation: hint-pulse 1.6s ease-in-out infinite;
+}
+
+.rules-screen-text--controls .controls-hint-item--wiggle .controls-hint-kbd {
+  animation: hint-wiggle 2s ease-in-out infinite;
+}
+
+.rules-screen-text--controls .controls-hint-item--shake .controls-hint-kbd {
+  animation: hint-shake 2.4s ease-in-out infinite;
 }
 
 /* Кегль задаётся в JS (useFitTextToHeight), до первого измерения — запасной размер */
@@ -592,6 +636,12 @@ video.youtube-bg.quiz-bg-video {
   width: 100%;
   flex: 1;
   min-height: 0;
+}
+
+.rules-screen-text-hint {
+  display: block;
+  font-size: 0.78em;
+  color: rgba(200, 218, 244, 0.88);
 }
 
 .rules-screen-start-wrap {
@@ -900,6 +950,43 @@ video.youtube-bg.quiz-bg-video {
   gap: 6px;
   pointer-events: none;
   z-index: 30;
+}
+
+/* Greenscreen-видео: под вопросами/ответами (z-index 1 < .app-overlay), половинный масштаб */
+.dock-chroma-layer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(max(12px, var(--safe-bottom)) + 10px);
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.dock-chroma-layer__inner {
+  width: 720px;
+  flex-shrink: 0;
+  transform: scale(0.5);
+  transform-origin: bottom center;
+}
+
+.dock-chroma-slot {
+  width: 100%;
+  line-height: 0;
+  border-radius: 22px 22px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.dock-chroma-video,
+.dock-chroma-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
 }
 
 .dock-pause-hint {
