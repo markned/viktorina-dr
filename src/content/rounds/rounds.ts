@@ -697,7 +697,7 @@ export const rounds: Round[] = [
   {
     id: 43,
     title: "Я люблю кататься на велике",
-    audioFile: "pasha-ya-lyublyu-katatsya-na-velike-cbaa63bc.mp3",
+    audioFile: "pasha-ya-lyublyu-katatsya-na-velike-cbaa63bc.m4a",
     start: 12.01,
     end: 18.22,
     lyrics: [
@@ -712,7 +712,7 @@ export const rounds: Round[] = [
   {
     id: 44,
     title: "Криптоминетчица",
-    audioFile: "metox-pasha-kriptominetchica-b0006214.mp3",
+    audioFile: "metox-pasha-kriptominetchica-b0006214.m4a",
     start: 90.17,
     end: 98.8,
     lyrics: [
@@ -742,7 +742,7 @@ export const rounds: Round[] = [
   {
     id: 48,
     title: "4:20",
-    audioFile: "kunteynir-4-20-9bd5a792.mp3",
+    audioFile: "kunteynir-4-20-9bd5a792.m4a",
     start: 102.7,
     end: 109,
     lyrics: [
@@ -757,7 +757,7 @@ export const rounds: Round[] = [
   {
     id: 49,
     title: "О том",
-    audioFile: "kunteynir-o-tom-bcdff094.mp3",
+    audioFile: "kunteynir-o-tom-bcdff094.m4a",
     start: 208.7,
     end: 218.7,
     lyrics: [
@@ -773,7 +773,7 @@ export const rounds: Round[] = [
   {
     id: 50,
     title: "В трусах",
-    audioFile: "kunteynir-v-trusah-166aa5ba.mp3",
+    audioFile: "kunteynir-v-trusah-166aa5ba.m4a",
     start: 30,
     end: 39.6,
     lyrics: [
@@ -790,7 +790,7 @@ export const rounds: Round[] = [
   {
     id: 51,
     title: "Звезда",
-    audioFile: "pasha-zvezda-e81ac4a6.mp3",
+    audioFile: "pasha-zvezda-e81ac4a6.m4a",
     start: 10.5,
     end: 18.9,
     lyrics: [
@@ -822,7 +822,7 @@ export const rounds: Round[] = [
   {
     id: 55,
     title: "Давай поговорим о футболе",
-    audioFile: "kunteynir-davay-pogovorim-o-futbole-839c228c.mp3",
+    audioFile: "kunteynir-davay-pogovorim-o-futbole-839c228c.m4a",
     start: 97.65,
     end: 104.36,
     lyrics: [
@@ -838,7 +838,7 @@ export const rounds: Round[] = [
   {
     id: 56,
     title: "Мент",
-    audioFile: "kunteynir-ment-ea30719e.mp3",
+    audioFile: "kunteynir-ment-ea30719e.m4a",
     start: 100.8,
     end: 107.13,
     lyrics: [
@@ -853,7 +853,7 @@ export const rounds: Round[] = [
   {
     id: 57,
     title: "Сколько дыма…",
-    audioFile: "kunteynir-skolko-dyma-d52677d4.mp3",
+    audioFile: "kunteynir-skolko-dyma-d52677d4.m4a",
     start: 64,
     end: 68.53,
     lyrics: [
@@ -883,7 +883,7 @@ export const rounds: Round[] = [
   {
     id: 59,
     title: "Всё включено",
-    audioFile: "kunteynir-vsyo-vklyucheno-c8f226d4.mp3",
+    audioFile: "kunteynir-vsyo-vklyucheno-c8f226d4.m4a",
     start: 6.1,
     end: 11.8,
     lyrics: [
