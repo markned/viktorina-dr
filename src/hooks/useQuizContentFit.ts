@@ -1,6 +1,18 @@
 import { useLayoutEffect, useRef } from "react";
 
 const MIN_SCALE = 0.22;
+/** Допуск при сравнении высоты с контейнером (округление / субпиксели). */
+const LAYOUT_EPSILON_PX = 1;
+
+function clearZoom(inner: HTMLElement) {
+  const s = inner.style as CSSStyleDeclaration & { zoom?: string };
+  s.zoom = "";
+  s.transform = "";
+}
+
+function setZoom(inner: HTMLElement, scale: number) {
+  (inner.style as CSSStyleDeclaration & { zoom?: string }).zoom = String(scale);
+}
 
 /**
  * Масштабирует блок с вопросами/подсказками/вариантами (CSS zoom), чтобы всё помещалось по высоте без скролла.
@@ -16,9 +28,7 @@ export function useQuizContentFit(measureKey: unknown) {
     if (!outer || !inner) return;
 
     const fit = () => {
-      const st = inner.style as unknown as { zoom?: string; transform?: string };
-      st.zoom = "";
-      st.transform = "";
+      clearZoom(inner);
       void inner.offsetHeight;
 
       const avail = outer.clientHeight;
@@ -28,13 +38,13 @@ export function useQuizContentFit(measureKey: unknown) {
       if (naturalH <= 0) return;
 
       let s = Math.max(MIN_SCALE, Math.min(1, avail / naturalH));
-      st.zoom = String(s);
+      setZoom(inner, s);
       void inner.offsetHeight;
 
       const rendered = inner.getBoundingClientRect().height;
-      if (rendered > avail + 1 && rendered > 0) {
-        const s2 = Math.max(MIN_SCALE, Math.min(s, s * (avail / rendered)));
-        st.zoom = String(s2);
+      if (rendered > avail + LAYOUT_EPSILON_PX && rendered > 0) {
+        s = Math.max(MIN_SCALE, Math.min(s, s * (avail / rendered)));
+        setZoom(inner, s);
       }
     };
 
