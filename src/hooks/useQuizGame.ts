@@ -52,6 +52,7 @@ import {
   parsePreviewRoundFromSession,
   stripPreviewQueryFromUrl,
 } from "../editor/previewRoundStorage";
+import { subscribeMasterVolume } from "../lib/masterVolume";
 
 const createPlayer = (): PlayerAdapter => new LocalMediaPlayer();
 
@@ -166,6 +167,12 @@ export function useQuizGame() {
   selectedQuizIndexRef.current = selectedQuizIndex;
   quizUiVariantRef.current = quizUiVariant;
   quizOrderUserIdsRef.current = quizOrderUserIds;
+
+  useEffect(() => {
+    return subscribeMasterVolume(() => {
+      playerRef.current?.refreshMasterVolume?.();
+    });
+  }, []);
 
   const [playOrder, setPlayOrder] = useState<Round[]>(() => {
     const inline = tryParseInlinePreviewRound();

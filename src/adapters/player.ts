@@ -9,6 +9,8 @@ export type PlayerAdapter = {
   seekToAsync: (time: number) => Promise<void>;
   getCurrentTime: () => number;
   setVolume: (volume: number) => void;
+  /** После смены общей громкости UI. */
+  refreshMasterVolume?: () => void;
   /** Нужен для старта с muted=true (политика браузера), затем снять при fade-in. */
   setMuted: (muted: boolean) => void;
   destroy?: () => void;

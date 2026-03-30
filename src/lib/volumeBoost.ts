@@ -1,4 +1,5 @@
 import { getSharedAudioContext } from "./audioUnlock";
+import { getMasterGainNode } from "./masterVolume";
 
 const VOLUME_BOOST = 1.25;
 /** Озвучка правил: +25% кино + 150% от этой базы ≈ 1.875× к исходному сигналу */
@@ -13,8 +14,9 @@ function connectBoost(element: HTMLMediaElement, gainValue: number): void {
     const source = ctx.createMediaElementSource(element);
     const gain = ctx.createGain();
     gain.gain.value = gainValue;
+    const master = getMasterGainNode(ctx);
     source.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(master);
     void ctx.resume();
   } catch {
     // fallback: без усиления

@@ -1,7 +1,10 @@
 import type { PlayerAdapter } from "./player";
+import { readMasterVolume } from "../lib/masterVolume";
 
 export class LocalMediaPlayer implements PlayerAdapter {
   private media: HTMLAudioElement;
+  /** Логическая громкость 0–1 (до умножения на общую). */
+  private logicalVolume = 1;
 
   constructor() {
     this.media = new Audio();
@@ -92,9 +95,19 @@ export class LocalMediaPlayer implements PlayerAdapter {
   }
 
   setVolume(volume: number): void {
-    const v = Math.min(1, Math.max(0, volume));
+    this.logicalVolume = Math.min(1, Math.max(0, volume));
+    this.applyMasterVolume();
+  }
+
+  /** После смены общей громкости (ползунок ПК). */
+  refreshMasterVolume(): void {
+    this.applyMasterVolume();
+  }
+
+  private applyMasterVolume(): void {
+    const v = this.logicalVolume * readMasterVolume();
     this.media.volume = v;
-    if (v > 0.001) {
+    if (this.logicalVolume > 0.001) {
       this.media.muted = false;
     }
   }
