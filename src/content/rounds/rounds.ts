@@ -636,7 +636,7 @@ export const rounds: Round[] = [
     audioFile: "06-pasha-tehnik-nuzhen-xanax-14ab85f2.m4a",
     backgroundVideo: {
       file: "bg/xanax.mp4",
-      start: 26,
+      start: 35,
     },
     start: 33.3,
     end: 39.5,
