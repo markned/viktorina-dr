@@ -42,7 +42,7 @@ export default function App() {
     content = <GameRulesScreen onComplete={game.skipGameRulesToModeSelect} />;
   } else if (game.roundState === "mode_select") {
     content = (
-      <ModeSelectScreen onSelectMode={game.selectGameMode} quizEligibleCount={game.quizEligibleCount} />
+      <ModeSelectScreen onSelectMode={game.selectGameMode} quizEligibleCount={game.quiz.eligibleCount} />
     );
   } else if (game.roundState === "rules") {
     if (!game.gameMode) {
@@ -51,8 +51,7 @@ export default function App() {
       content = <RulesScreen onComplete={game.skipRulesAndStart} gameMode={game.gameMode} />;
     }
   } else if (game.roundState === "finished") {
-    const subtitle =
-      game.gameMode === "quiz" ? `Правильных ответов: ${game.quizScore}` : undefined;
+    const subtitle = game.gameMode === "quiz" ? `Правильных ответов: ${game.quiz.score}` : undefined;
     content = (
       <OutroScreen
         videoSrc={game.outroVideoSrc}
@@ -90,10 +89,10 @@ export default function App() {
           onToggle={game.toggleGamePause}
           touchMode={game.gesturePauseLayout}
           gameMode={game.gameMode}
-          quizUiVariant={game.quizUiVariant}
-          onReturnToModeSelectRequest={() => game.setShowRestartConfirm(true)}
-          onExitToStart={() => game.setShowExitConfirm(true)}
-          onRulesRequest={() => game.setShowRulesOverlay(true)}
+          quizUiVariant={game.quiz.uiVariant}
+          onReturnToModeSelectRequest={() => game.overlay.setShowRestartConfirm(true)}
+          onExitToStart={() => game.overlay.setShowExitConfirm(true)}
+          onRulesRequest={() => game.overlay.setShowRulesOverlay(true)}
         />
         <div className="app-overlay" key={game.roundIndex}>
           <QuizScreen
@@ -102,14 +101,14 @@ export default function App() {
             totalRounds={game.orderedRounds.length}
             roundState={game.roundState}
             gameMode={game.gameMode}
-            quizScore={game.quizScore}
-            quizOptions={game.quizOptions}
-            quizUiVariant={game.quizUiVariant}
-            quizOrderUserIds={game.quizOrderUserIds}
-            onReorderQuizOrder={game.reorderQuizOrderLines}
-            quizCorrectIndex={game.quizCorrectIndex}
-            selectedQuizIndex={game.selectedQuizIndex}
-            onSelectQuizOption={game.setQuizSelection}
+            quizScore={game.quiz.score}
+            quizOptions={game.quiz.options}
+            quizUiVariant={game.quiz.uiVariant}
+            quizOrderUserIds={game.quiz.orderUserIds}
+            onReorderQuizOrder={game.quiz.reorderLines}
+            quizCorrectIndex={game.quiz.correctIndex}
+            selectedQuizIndex={game.quiz.selectedIndex}
+            onSelectQuizOption={game.quiz.setSelection}
             hintLines={game.hintLines}
             revealLines={game.revealLines}
             visibleHintLineCount={game.visibleHintLineCount}
@@ -118,28 +117,34 @@ export default function App() {
             gamePaused={game.gamePaused}
             onReplaySnippet={game.replaySnippet}
             onReveal={game.handleRevealClick}
-            onConfirmQuiz={game.confirmQuizRound}
+            onConfirmQuiz={game.quiz.confirm}
             onNextRound={game.nextRound}
           />
         </div>
         <RestartConfirmDialog
-          open={game.showRestartConfirm}
-          onCancel={() => game.setShowRestartConfirm(false)}
+          open={game.overlay.showRestartConfirm}
+          onCancel={() => game.overlay.setShowRestartConfirm(false)}
           onConfirm={() => {
-            game.setShowRestartConfirm(false);
+            game.overlay.setShowRestartConfirm(false);
             game.returnToModeSelect();
           }}
         />
         <ExitConfirmDialog
-          open={game.showExitConfirm}
-          onCancel={() => game.setShowExitConfirm(false)}
+          open={game.overlay.showExitConfirm}
+          onCancel={() => game.overlay.setShowExitConfirm(false)}
           onConfirm={() => {
-            game.setShowExitConfirm(false);
+            game.overlay.setShowExitConfirm(false);
             game.exitToStartScreen();
           }}
         />
-        <RulesOverlay open={game.showRulesOverlay} onClose={() => game.setShowRulesOverlay(false)} />
-        <TransitionOverlay visible={game.roundState === "transition"} nextRoundTitle={game.upcomingRoundTitle} />
+        <RulesOverlay
+          open={game.overlay.showRulesOverlay}
+          onClose={() => game.overlay.setShowRulesOverlay(false)}
+        />
+        <TransitionOverlay
+          visible={game.roundState === "transition"}
+          nextRoundTitle={game.upcomingRoundTitle}
+        />
       </main>
     );
   }

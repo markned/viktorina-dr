@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { editorDevPlugin } from "./vite/editorDevPlugin";
@@ -13,4 +14,7 @@ export default defineConfig({
     strictPort: true,
   },
   plugins: [react(), photosManifestPlugin(), geniusDevPlugin(), editorDevPlugin()],
+  test: {
+    environment: "node",
+  },
 });

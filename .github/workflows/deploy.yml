@@ -23,6 +23,9 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm test
       - run: npm run build
       # Как upload-pages-artifact@v4, но с actions/upload-artifact@v7 (node24), без старого upload-artifact@4.x
       - name: Archive Pages artifact

@@ -42,9 +42,11 @@ export function useModeSelectMobileDemo(quizDisabled: boolean) {
   }, [mobileDemo, quizDisabled]);
 
   useEffect(() => {
+    const fv = freestyleRef.current;
+    const qv = quizRef.current;
     return () => {
-      pauseModeSelectPreview(freestyleRef.current);
-      pauseModeSelectPreview(quizRef.current);
+      pauseModeSelectPreview(fv);
+      pauseModeSelectPreview(qv);
     };
   }, []);
 
@@ -68,11 +70,6 @@ export function useModeSelectMobileDemo(quizDisabled: boolean) {
       onDemoEndedFreestyle: isMobileDemo ? onFreestyleEnded : undefined,
       onDemoEndedQuiz: isMobileDemo ? onQuizEnded : undefined,
     }),
-    [
-      isMobileDemo,
-      mobileDemo,
-      onFreestyleEnded,
-      onQuizEnded,
-    ],
+    [isMobileDemo, mobileDemo, onFreestyleEnded, onQuizEnded],
   );
 }

@@ -8,8 +8,7 @@ export const DEFAULT_QUIZ_SESSION_LENGTH = 14;
 const BASE = `${(import.meta.env.BASE_URL ?? "/").replace(/\/?$/, "/")}`;
 
 /** Путь к файлу с учётом base (работает на GitHub Pages) */
-export const assetUrl = (path: string) =>
-  BASE + (path.startsWith("/") ? path.slice(1) : path);
+export const assetUrl = (path: string) => BASE + (path.startsWith("/") ? path.slice(1) : path);
 
 /** Путь к файлу в `public/content/video/` с подпапками (кодируется каждое имя сегмента). */
 export const assetUrlVideoRelative = (relativePath: string) =>
@@ -36,8 +35,8 @@ export const assetUrlVideoRelative = (relativePath: string) =>
 export const getGuessSeconds = (revealLineCount: number): number =>
   revealLineCount <= 1 ? 30 : revealLineCount === 2 ? 45 : 60;
 
-/** ~4–5 кадров при 60 Hz + запас под мобильный движок; сама пауза дополнительно «прибивает» seek. */
-export const STOP_SAFETY_MARGIN_SEC = 0.07;
+/** ~2 кадра при 30 Hz (бюджетный Android) + запас под мобильный движок. Немедленное mute при обнаружении покрывает задержку pause(). */
+export const STOP_SAFETY_MARGIN_SEC = 0.12;
 
 /** Время, на котором останавливаем фрагмент (до `end`). */
 export function fragmentStopTimeSec(fragmentEndSec: number): number {

@@ -1,0 +1,102 @@
+.quiz-bg-root {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.quiz-bg-surface {
+  position: absolute;
+  inset: 0;
+}
+
+.photo-bg-stack {
+  position: absolute;
+  inset: 0;
+}
+
+.photo-bg-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.youtube-bg-dual {
+  position: absolute;
+  inset: 0;
+}
+
+/* Затемнение поверх iframe (iframe остаётся непрозрачным — стабильнее автозапуск) */
+.youtube-bg-dim-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.52);
+  pointer-events: none;
+}
+
+/* Обрезка по краям экрана без «полос»: iframe 16:9 в режиме cover */
+.youtube-bg-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.youtube-bg-wrap.youtube-bg-wrap-layer {
+  opacity: 1;
+}
+
+.youtube-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 56.25vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-width: 177.78vh;
+  transform: translate3d(-50%, -50%, 0);
+  border: 0;
+  max-width: none;
+  backface-visibility: hidden;
+}
+
+video.youtube-bg.quiz-bg-video {
+  object-fit: cover;
+}
+
+.photo-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.45;
+}
+
+.youtube-bg-wrap.youtube-bg-foreground {
+  opacity: 1;
+}
+
+.cinematic-label {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.8);
+}

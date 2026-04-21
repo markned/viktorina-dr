@@ -73,14 +73,7 @@ export function DockChromaKeyVideo({ src }: { src: string }) {
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(
       gl.ARRAY_BUFFER,
-      new Float32Array([
-        -1, -1, 0, 1,
-        1, -1, 1, 1,
-        -1, 1, 0, 0,
-        -1, 1, 0, 0,
-        1, -1, 1, 1,
-        1, 1, 1, 0,
-      ]),
+      new Float32Array([-1, -1, 0, 1, 1, -1, 1, 1, -1, 1, 0, 0, -1, 1, 0, 0, 1, -1, 1, 1, 1, 1, 1, 0]),
       gl.STATIC_DRAW,
     );
 

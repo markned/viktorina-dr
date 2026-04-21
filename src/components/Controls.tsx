@@ -57,9 +57,7 @@ export function Controls({
   const isQuiz = gameMode === "quiz";
   const canRevealFreestyle = !isQuiz && roundState === "timer_finished";
   const canConfirmQuiz =
-    isQuiz &&
-    roundState === "paused_for_guess" &&
-    (quizUiVariant === "order" || selectedQuizIndex !== null);
+    isQuiz && roundState === "paused_for_guess" && (quizUiVariant === "order" || selectedQuizIndex !== null);
   const canNext = roundState === "reveal";
   const canReplay = roundState !== "transition" && roundState !== "quiz_feedback";
 
@@ -70,43 +68,48 @@ export function Controls({
     <div className="dock-host">
       <p className="dock-pause-hint">{pauseHint}</p>
       <nav ref={dockRef} className="dock" role="toolbar">
-      <button
-        type="button"
-        className="dock-btn dock-btn-replay"
-        onClick={onReplaySnippet}
-        disabled={!canReplay}
-        title="Повторить фрагмент (R)"
-      >
-        <ReplayWithPlayIcon />
-      </button>
-      <button
-        className={`dock-btn dock-btn-primary ${canPrimary ? "" : "dock-btn-dimmed"}`}
-        onClick={primaryAction}
-        disabled={isQuiz && roundState === "paused_for_guess" && quizUiVariant !== "order" && selectedQuizIndex === null}
-        title={
-          isQuiz
-            ? canConfirmQuiz
-              ? "Подтвердить ответ (пробел)"
-              : quizUiVariant === "order"
-                ? "Подтвердить порядок (пробел)"
-                : "Сначала выберите вариант"
-            : canRevealFreestyle
-              ? "Открыть ответ (пробел)"
-              : "Тройной клик или пробел — вскрыть ответ"
-        }
-        aria-label={isQuiz ? "Подтвердить ответ" : "Показать ответ"}
-      >
-        {isQuiz ? "✓" : "👁"}
-      </button>
-      <button
-        className={`dock-btn dock-btn-primary ${canNext ? "" : "dock-btn-dimmed"}`}
-        onClick={onNextRound}
-        disabled={!canNext}
-        title="Следующий раунд (→)"
-      >
-        →
-      </button>
-    </nav>
+        <button
+          type="button"
+          className="dock-btn dock-btn-replay"
+          onClick={onReplaySnippet}
+          disabled={!canReplay}
+          title="Повторить фрагмент (R)"
+        >
+          <ReplayWithPlayIcon />
+        </button>
+        <button
+          className={`dock-btn dock-btn-primary ${canPrimary ? "" : "dock-btn-dimmed"}`}
+          onClick={primaryAction}
+          disabled={
+            isQuiz &&
+            roundState === "paused_for_guess" &&
+            quizUiVariant !== "order" &&
+            selectedQuizIndex === null
+          }
+          title={
+            isQuiz
+              ? canConfirmQuiz
+                ? "Подтвердить ответ (пробел)"
+                : quizUiVariant === "order"
+                  ? "Подтвердить порядок (пробел)"
+                  : "Сначала выберите вариант"
+              : canRevealFreestyle
+                ? "Открыть ответ (пробел)"
+                : "Тройной клик или пробел — вскрыть ответ"
+          }
+          aria-label={isQuiz ? "Подтвердить ответ" : "Показать ответ"}
+        >
+          {isQuiz ? "✓" : "👁"}
+        </button>
+        <button
+          className={`dock-btn dock-btn-primary ${canNext ? "" : "dock-btn-dimmed"}`}
+          onClick={onNextRound}
+          disabled={!canNext}
+          title="Следующий раунд (→)"
+        >
+          →
+        </button>
+      </nav>
     </div>
   );
 }

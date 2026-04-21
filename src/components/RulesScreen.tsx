@@ -26,10 +26,7 @@ export function RulesScreen({ onComplete, gameMode }: RulesScreenProps) {
           <div ref={textRef} className="rules-screen-text rules-screen-text--controls">
             <ul className="controls-hint-list controls-hint-list--in-rules">
               {lines.map((line, i) => (
-                <li
-                  key={i}
-                  className={`controls-hint-item controls-hint-item--${line.anim}`}
-                >
+                <li key={i} className={`controls-hint-item controls-hint-item--${line.anim}`}>
                   <span className="controls-hint-kbd" aria-hidden>
                     {line.kbd}
                   </span>

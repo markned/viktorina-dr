@@ -15,11 +15,8 @@ function useDualCrossfade(current: string | null): DualState {
   }));
 
   useEffect(() => {
-    if (current == null) {
-      setState({ a: null, b: null, showA: true });
-      return;
-    }
     setState((prev) => {
+      if (current == null) return { a: null, b: null, showA: true };
       const visible = prev.showA ? prev.a : prev.b;
       if (current === visible) return prev;
       if (prev.a === null && prev.b === null) {

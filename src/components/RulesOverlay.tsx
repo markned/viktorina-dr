@@ -21,12 +21,7 @@ export function RulesOverlay({ open, onClose }: RulesOverlayProps) {
           playAudio={false}
           footer={
             <div className="rules-screen-start-wrap">
-              <button
-                type="button"
-                className="rules-screen-start-btn"
-                onClick={onClose}
-                aria-label="Закрыть"
-              >
+              <button type="button" className="rules-screen-start-btn" onClick={onClose} aria-label="Закрыть">
                 ✕
               </button>
             </div>

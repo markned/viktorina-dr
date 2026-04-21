@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { registerGlobalAudioUnlock } from "./lib/audioUnlock";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./styles.css";
 
 registerGlobalAudioUnlock();
@@ -19,7 +20,9 @@ async function bootstrap() {
     const { default: App } = await import("./App");
     ReactDOM.createRoot(root).render(
       <React.StrictMode>
-        <App />
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
       </React.StrictMode>,
     );
   }

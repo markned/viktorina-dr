@@ -128,20 +128,17 @@ export function buildQuizOptionsTwoLine(
 ): { options: string[]; correctIndex: number } {
   const correct = revealAnswerText(round);
   const prior = priorCorrectAnswers ?? new Set<string>();
-  const twoLineTexts = shuffle(
-    [
-      ...new Set(
-        distractorPool
-          .filter((r) => r.id !== round.id && r.revealLineIds.length === 2)
-          .map((r) => revealAnswerText(r))
-          .filter((t) => t !== correct && !prior.has(t)),
-      ),
-    ],
-  );
+  const twoLineTexts = shuffle([
+    ...new Set(
+      distractorPool
+        .filter((r) => r.id !== round.id && r.revealLineIds.length === 2)
+        .map((r) => revealAnswerText(r))
+        .filter((t) => t !== correct && !prior.has(t)),
+    ),
+  ]);
 
   const maxTwoLineWrong = Math.min(2, twoLineTexts.length);
-  const twoLineWrongCount =
-    maxTwoLineWrong === 0 ? 0 : 1 + Math.floor(Math.random() * maxTwoLineWrong);
+  const twoLineWrongCount = maxTwoLineWrong === 0 ? 0 : 1 + Math.floor(Math.random() * maxTwoLineWrong);
 
   const wrong: string[] = [];
   const used = new Set<string>();

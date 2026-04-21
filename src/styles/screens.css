@@ -1,0 +1,674 @@
+.start-screen-layout {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #0a0d14;
+}
+
+/* Нижний блок — как .game-pause-menu: safe-area и центрирование по ширине */
+.start-screen-footer {
+  position: absolute;
+  left: max(16px, var(--safe-left));
+  right: max(16px, var(--safe-right));
+  bottom: max(16px, var(--safe-bottom));
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: min(42rem, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.start-screen-disclaimer {
+  margin: 0;
+  padding: 0;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: rgba(248, 251, 255, 0.42);
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.start-screen-disclaimer p {
+  margin: 0;
+}
+
+.start-screen-disclaimer-rip {
+  margin: 0 0 0.35rem;
+  color: rgba(248, 251, 255, 0.55);
+  font-weight: 600;
+}
+
+.start-icon {
+  max-width: min(280px, 50vw);
+  height: auto;
+  animation: shake 0.6s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(-2deg) translateY(0);
+  }
+  25% {
+    transform: rotate(2deg) translateY(-4px);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(0);
+  }
+  75% {
+    transform: rotate(2deg) translateY(-4px);
+  }
+}
+
+.start-screen-author {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 14px;
+  padding: 10px 16px 6px;
+  font-size: 0.88rem;
+  color: rgba(248, 251, 255, 0.75);
+  flex-shrink: 0;
+}
+
+.start-screen-author-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  line-height: 0;
+  text-decoration: none;
+  border-radius: 50%;
+  transition:
+    opacity 0.22s ease,
+    filter 0.22s ease;
+  opacity: 0.62;
+}
+
+.start-screen-author-icon-link:hover {
+  opacity: 1;
+}
+
+.start-screen-author-icon-link:active {
+  opacity: 0.88;
+}
+
+.start-screen-author-icon-link img {
+  display: block;
+  width: clamp(28px, 8vw, 36px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  transition: filter 0.22s ease;
+}
+
+.start-screen-author-icon-link:hover img {
+  filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.55));
+}
+
+.intro-outro-video {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100dvh;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.intro-outro-foreground {
+  z-index: 2;
+}
+
+.intro-video-shell,
+.outro-video-shell {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100dvh;
+}
+
+.intro-skip-btn {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, var(--safe-bottom));
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    filter 0.15s ease,
+    transform 0.12s ease;
+}
+
+.intro-skip-btn:hover {
+  filter: brightness(1.08);
+}
+
+.intro-skip-btn:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+.intro-skip-btn-icon {
+  display: block;
+  margin-left: 2px;
+}
+
+/* Правила поверх квиза: те же отступы и flex, что у .rules-screen-shell — карточка того же размера */
+.rules-overlay-root {
+  position: fixed;
+  inset: 0;
+  z-index: 48;
+  width: 100%;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: max(8px, var(--safe-top)) max(12px, var(--safe-right)) max(8px, var(--safe-bottom))
+    max(12px, var(--safe-left));
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rules-overlay-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(10, 13, 20, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+.rules-overlay-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.rules-screen-shell {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0a0d14;
+  padding: max(8px, var(--safe-top)) max(12px, var(--safe-right)) max(8px, var(--safe-bottom))
+    max(12px, var(--safe-left));
+  overflow: hidden;
+}
+
+.rules-screen-card {
+  width: 100%;
+  max-width: min(640px, 100%);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  background: rgba(18, 26, 43, 0.95);
+  border: 1px solid rgba(128, 151, 196, 0.22);
+  border-radius: 22px;
+  padding: clamp(14px, 3.5vmin, 28px) clamp(16px, 4vw, 32px);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.rules-screen-title {
+  margin: 0 0 clamp(8px, 2vmin, 16px);
+  flex-shrink: 0;
+  font-size: clamp(1.2rem, 4.7vmin, 2.05rem);
+  font-weight: 700;
+  color: #f8fbff;
+}
+
+.rules-screen-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.controls-screen-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Экран «Управление»: без прокрутки, кегль как у карточки правил (useFitTextToHeight) */
+.rules-screen-shell .rules-screen-body.controls-screen-body {
+  overflow: hidden;
+}
+
+.controls-hint-list--in-rules {
+  margin: 0;
+  padding: 0 0 6px;
+  width: 100%;
+  align-self: flex-start;
+  list-style: none;
+}
+
+.rules-screen-text--controls {
+  white-space: normal;
+}
+
+/* Подсказки по управлению — тот же кегль/цвет/интерлиньяж, что у основного текста правил; бейджи — как .rules-screen-text-hint */
+.rules-screen-text--controls .controls-hint-list {
+  gap: 0.65em;
+}
+
+.rules-screen-text--controls .controls-hint-item {
+  font-size: inherit;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: #c8daf4;
+  gap: 0.55em;
+  align-items: flex-start;
+}
+
+.rules-screen-text--controls .controls-hint-kbd {
+  flex-shrink: 0;
+  min-width: 2.5em;
+  padding: 0.28em 0.5em;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.78em;
+  line-height: 1.35;
+  color: rgba(200, 218, 244, 0.95);
+}
+
+.rules-screen-text--controls .controls-hint-item--pulse .controls-hint-kbd {
+  animation: hint-pulse 1.6s ease-in-out infinite;
+}
+
+.rules-screen-text--controls .controls-hint-item--wiggle .controls-hint-kbd {
+  animation: hint-wiggle 2s ease-in-out infinite;
+}
+
+.rules-screen-text--controls .controls-hint-item--shake .controls-hint-kbd {
+  animation: hint-shake 2.4s ease-in-out infinite;
+}
+
+/* Кегль задаётся в JS (useFitTextToHeight), до первого измерения — запасной размер */
+.rules-screen-text {
+  margin: 0;
+  font-family: inherit;
+  font-size: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  white-space: pre-wrap;
+  color: #c8daf4;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.rules-screen-text-hint {
+  display: block;
+  font-size: 0.78em;
+  color: rgba(200, 218, 244, 0.88);
+}
+
+.rules-screen-start-wrap {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: clamp(10px, 2vmin, 18px);
+}
+
+.rules-screen-start-btn {
+  width: 54px;
+  height: 54px;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  font-size: 1.45rem;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.15s,
+    filter 0.15s;
+}
+
+.rules-screen-start-btn:hover {
+  filter: brightness(1.06);
+}
+
+.rules-screen-start-btn:active {
+  transform: scale(0.94);
+}
+
+.outro-video-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.outro-actions {
+  position: fixed;
+  z-index: 10;
+  bottom: max(24px, var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  max-width: calc(100vw - 24px);
+}
+
+.outro-menu-btn {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: linear-gradient(135deg, #bc3350, #8b2439);
+  color: #fff;
+  font-size: 1.65rem;
+  line-height: 1;
+  font-weight: 300;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 24px rgba(139, 36, 57, 0.45);
+  touch-action: manipulation;
+  transition:
+    transform 0.12s,
+    filter 0.12s;
+}
+
+.outro-menu-btn:hover {
+  filter: brightness(1.08);
+}
+
+.outro-menu-btn:active {
+  transform: scale(0.94);
+}
+
+.outro-restart-btn {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s;
+}
+
+.outro-restart-btn:active {
+  transform: scale(0.92);
+}
+
+.outro-subtitle {
+  position: fixed;
+  z-index: 12;
+  left: 50%;
+  bottom: max(110px, calc(var(--safe-bottom) + 96px));
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: min(90vw, 420px);
+  text-align: center;
+  font-size: clamp(1rem, 2.8vw, 1.25rem);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.confirm-dialog {
+  width: min(420px, 100%);
+  background: #10192c;
+  border: 1px solid rgba(158, 180, 227, 0.32);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.confirm-dialog h4 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.confirm-dialog p {
+  margin: 0 0 20px;
+  color: #bbcaea;
+  font-size: 0.95rem;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* ——— Выбор режима: сплит-экран + видео-фоны ——— */
+.mode-select-shell {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #000;
+  z-index: 1;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Тач: автодемо — неактивная половина чуть тусклее */
+.mode-select-shell--mobile-demo .mode-select-pane:not(.mode-select-pane--demo-active):not(:disabled) {
+  opacity: 0.72;
+  transition: opacity 0.35s ease;
+}
+
+.mode-select-shell--mobile-demo .mode-select-pane--demo-active:not(:disabled) {
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+.mode-select-split {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.mode-select-pane {
+  position: relative;
+  flex: 1 1 50%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: block;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mode-select-pane--disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.mode-select-pane__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mode-select-pane__tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: background 0.28s ease;
+}
+
+.mode-select-pane__tint--green {
+  background: rgba(12, 88, 52, 0.5);
+}
+
+.mode-select-pane__tint--red {
+  background: rgba(110, 22, 32, 0.52);
+}
+
+@media (hover: hover) {
+  .mode-select-pane:not(:disabled):hover .mode-select-pane__tint--green {
+    background: rgba(24, 140, 82, 0.44);
+  }
+
+  .mode-select-pane:not(:disabled):hover .mode-select-pane__tint--red {
+    background: rgba(160, 36, 52, 0.46);
+  }
+}
+
+/* Тач: очередь автодемо — те же оттенки, что при ховере на десктопе */
+.mode-select-pane:not(:disabled).mode-select-pane--demo-active .mode-select-pane__tint--green {
+  background: rgba(24, 140, 82, 0.44);
+}
+
+.mode-select-pane:not(:disabled).mode-select-pane--demo-active .mode-select-pane__tint--red {
+  background: rgba(160, 36, 52, 0.46);
+}
+
+.mode-select-pane__content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2.2vmin, 16px);
+  padding: max(20px, var(--safe-top)) max(20px, var(--safe-right)) max(20px, var(--safe-bottom))
+    max(20px, var(--safe-left));
+  color: #fff;
+  text-shadow:
+    0 2px 18px rgba(0, 0, 0, 0.9),
+    0 0 1px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+.mode-select-pane__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+}
+
+.mode-select-pane__desc {
+  margin: 0;
+  max-width: min(22rem, 92%);
+  font-size: clamp(0.88rem, 2.1vw, 1.08rem);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.mode-select-pane__warn {
+  margin: 0;
+  max-width: min(22rem, 92%);
+  font-size: clamp(0.78rem, 1.8vw, 0.92rem);
+  font-weight: 600;
+  color: #ffc9d2;
+}
+
+@media (max-width: 900px) {
+  .mode-select-split {
+    flex-direction: column;
+  }
+
+  .mode-select-pane {
+    flex: 1 1 50%;
+    min-height: 0;
+  }
+}

@@ -3,16 +3,11 @@ import { LocalMediaPlayer } from "../adapters/localMediaPlayer";
 import type { PlayerAdapter } from "../adapters/player";
 import { useCoarsePointer } from "./useCoarsePointer";
 import { useGesturePauseLayout } from "./useGesturePauseLayout";
+import { useOverlayState } from "./useOverlayState";
+import { useQuizRoundState } from "./useQuizRoundState";
 import { pickLyricLines } from "../helpers/lyrics";
 import { getYouTubeEmbedUrl, toLocalMediaUrl } from "../helpers/media";
 import { buildQuizEligiblePool, buildQuizSessionPlayOrder } from "../helpers/quizMode";
-import {
-  buildQuizMcOptions,
-  getQuizUiVariant,
-  revealAnswerText,
-  type QuizUiVariant,
-} from "../helpers/quizOptions";
-import { shuffleUntilOrderDiffers } from "../helpers/shuffle";
 import { buildSessionPlayOrder } from "../helpers/quizOrder";
 import { buildBackgroundPhotoSequence } from "../helpers/backgroundPhotos";
 import {
@@ -43,7 +38,11 @@ import {
   stopAllTimerCountSounds,
 } from "../lib/timerSounds";
 import type { GameMode, Round, RoundState } from "../types";
-import { editorHref, isPreviewQueryActive, parsePreviewRoundFromSession } from "../editor/previewRoundStorage";
+import {
+  editorHref,
+  isPreviewQueryActive,
+  parsePreviewRoundFromSession,
+} from "../editor/previewRoundStorage";
 import { subscribeMasterVolume } from "../lib/masterVolume";
 import { readPreviewEditorGameModeFromSearch } from "../helpers/previewEditorMode";
 import { visibleRoundsForSession } from "../helpers/sessionRounds";
@@ -61,6 +60,38 @@ export function useQuizGame() {
   const isPreviewModeRef = useRef(!!previewRound);
   isPreviewModeRef.current = !!previewRound;
 
+  const {
+    showRestartConfirm,
+    setShowRestartConfirm,
+    showExitConfirm,
+    setShowExitConfirm,
+    showRulesOverlay,
+    setShowRulesOverlay,
+    dismissOverlayChrome,
+  } = useOverlayState();
+
+  const {
+    quizScore,
+    quizOptions,
+    quizUiVariant,
+    quizOrderUserIds,
+    selectedQuizIndex,
+    quizCorrectIndex,
+    variantRef: quizUiVariantRef,
+    selectedIndexRef: selectedQuizIndexRef,
+    priorCorrectAnswersRef: quizPriorCorrectAnswersRef,
+    distractorPoolRef: quizDistractorPoolRef,
+    feedbackTimeoutRef: quizFeedbackTimeoutRef,
+    resetQuizRoundUi,
+    setupRoundQuizUi,
+    clearRoundForFreestyle,
+    computeIsCorrect,
+    addScore,
+    recordAnswer,
+    setQuizSelection: setQuizSelectionDirect,
+    reorderQuizOrderLines: reorderQuizOrderLinesDirect,
+  } = useQuizRoundState();
+
   const [roundState, setRoundState] = useState<RoundState>(() =>
     tryParseInlinePreviewRound() ? "transition" : "intro",
   );
@@ -68,18 +99,10 @@ export function useQuizGame() {
   const [timerSeconds, setTimerSeconds] = useState(() =>
     previewRound ? getGuessSeconds(previewRound.revealLineIds.length) : 60,
   );
-  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
-  const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [showRulesOverlay, setShowRulesOverlay] = useState(false);
   const [isStartCinematic, setIsStartCinematic] = useState(false);
   const [previewEditorGameMode] = useState<GameMode>(readPreviewEditorGameModeFromSearch);
 
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
-  const [quizScore, setQuizScore] = useState(0);
-  const [quizOptions, setQuizOptions] = useState<string[]>([]);
-  const [quizUiVariant, setQuizUiVariant] = useState<QuizUiVariant | null>(null);
-  const [quizOrderUserIds, setQuizOrderUserIds] = useState<number[]>([]);
-  const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
   const [upcomingRoundTitle, setUpcomingRoundTitle] = useState<string>(() => previewRound?.title ?? "");
   const [visibleHintLineCount, setVisibleHintLineCount] = useState(0);
   const [gamePaused, setGamePaused] = useState(false);
@@ -88,6 +111,7 @@ export function useQuizGame() {
 
   const playerRef = useRef<PlayerAdapter | null>(null);
   const rafRef = useRef<number | null>(null);
+  const backupStopTimerRef = useRef<number | null>(null);
   const countdownCancelRef = useRef<(() => void) | null>(null);
   const fadeCancelRef = useRef<(() => void) | null>(null);
   const pausedAtRef = useRef<number>(0);
@@ -99,15 +123,6 @@ export function useQuizGame() {
   const gameModeRef = useRef<GameMode | null>(null);
   const timerSecondsRef = useRef(timerSeconds);
   const gamePausedRef = useRef(false);
-  const quizCorrectIndexRef = useRef(0);
-  const selectedQuizIndexRef = useRef<number | null>(null);
-  const quizUiVariantRef = useRef<QuizUiVariant | null>(null);
-  const quizOrderUserIdsRef = useRef<number[]>([]);
-  const quizDistractorPoolRef = useRef<Round[]>([]);
-  /** Тексты ответов по уже завершённым раундам викторины (после показа reveal) — не использовать как дистракторы. */
-  const quizPriorCorrectAnswersRef = useRef<Set<string>>(new Set());
-  const quizFeedbackTimeoutRef = useRef<number | null>(null);
-  const [quizCorrectIndex, setQuizCorrectIndex] = useState(0);
   const replaySnippetRef = useRef<() => void>(() => {});
   const nextRoundRef = useRef<() => void>(() => {});
   const handleRevealClickRef = useRef<() => void>(() => {});
@@ -115,29 +130,10 @@ export function useQuizGame() {
   /** После перехода из редактора `?preview=1` — новая страница без жеста; Safari блокирует звук до первого касания. */
   const previewInitialGestureDoneRef = useRef(false);
 
-  const resetQuizRoundUi = useCallback(() => {
-    setQuizScore(0);
-    setQuizOptions([]);
-    setQuizUiVariant(null);
-    setQuizOrderUserIds([]);
-    setSelectedQuizIndex(null);
-    setQuizCorrectIndex(0);
-    quizPriorCorrectAnswersRef.current.clear();
-  }, []);
-
-  const dismissOverlayChrome = useCallback(() => {
-    setShowRestartConfirm(false);
-    setShowExitConfirm(false);
-    setShowRulesOverlay(false);
-  }, []);
-
   roundStateRef.current = roundState;
   gameModeRef.current = gameMode;
   timerSecondsRef.current = timerSeconds;
   gamePausedRef.current = gamePaused;
-  selectedQuizIndexRef.current = selectedQuizIndex;
-  quizUiVariantRef.current = quizUiVariant;
-  quizOrderUserIdsRef.current = quizOrderUserIds;
 
   useEffect(() => {
     return subscribeMasterVolume(() => {
@@ -158,9 +154,7 @@ export function useQuizGame() {
       setPlayOrder([previewRound]);
       return;
     }
-    setPlayOrder((prev) =>
-      prev.length === 0 ? buildSessionPlayOrder(visibleRoundsForSession()) : prev,
-    );
+    setPlayOrder((prev) => (prev.length === 0 ? buildSessionPlayOrder(visibleRoundsForSession()) : prev));
   }, [previewLoading, previewRound]);
 
   useEffect(() => {
@@ -199,10 +193,7 @@ export function useQuizGame() {
       ? assetUrl(`/content/photos/${randomPhotoSequence[roundIndex]}`)
       : null;
 
-  const hintLines = useMemo(
-    () => (round ? pickLyricLines(round.lyrics, round.hintLineIds) : []),
-    [round],
-  );
+  const hintLines = useMemo(() => (round ? pickLyricLines(round.lyrics, round.hintLineIds) : []), [round]);
   const revealLines = useMemo(
     () => (round ? pickLyricLines(round.lyrics, round.revealLineIds) : []),
     [round],
@@ -212,6 +203,10 @@ export function useQuizGame() {
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
+    }
+    if (backupStopTimerRef.current !== null) {
+      window.clearTimeout(backupStopTimerRef.current);
+      backupStopTimerRef.current = null;
     }
   };
 
@@ -264,25 +259,9 @@ export function useQuizGame() {
 
   const finalizeQuizRound = () => {
     const r = orderedRoundsRef.current[roundIndexRef.current];
-    const variant = quizUiVariantRef.current;
-    let isCorrect = false;
-    if (variant === "order" && r) {
-      const order = quizOrderUserIdsRef.current;
-      const reveal = r.revealLineIds;
-      isCorrect = order.length === reveal.length && order.every((id, i) => id === reveal[i]);
-    } else if (variant === "mc4") {
-      const selected = selectedQuizIndexRef.current;
-      const correctIdx = quizCorrectIndexRef.current;
-      isCorrect = selected !== null && selected === correctIdx;
-    } else {
-      isCorrect = false;
-    }
-    if (isCorrect) {
-      setQuizScore((s) => s + 1);
-    }
-    if (r) {
-      quizPriorCorrectAnswersRef.current.add(revealAnswerText(r));
-    }
+    const isCorrect = r ? computeIsCorrect(r) : false;
+    if (isCorrect) addScore();
+    if (r) recordAnswer(r);
     playQuizAnswerFeedbackSound(isCorrect);
     clearQuizFeedbackTimeout();
     setRoundState("quiz_feedback");
@@ -324,27 +303,37 @@ export function useQuizGame() {
   ) => {
     stopPlaybackMonitor();
     const player = ensurePlayer();
+    const stopAt = fragmentStopTimeSec(activeRound.end);
+
+    const doFragmentStop = () => {
+      // Отменяем RAF и резервный таймер до любых state-изменений
+      stopPlaybackMonitor();
+      setVisibleHintLineCount(hintLineCount);
+      // Немедленно заглушаем: на Android pause() имеет аппаратную задержку 30–100ms,
+      // muted=true/volume=0 срабатывают до очистки буфера декодера и не дают услышать ответ.
+      player.setMuted(true);
+      player.setVolume(0);
+      player.pause();
+      player.seekTo(stopAt);
+      pausedAtRef.current = stopAt;
+      const guessSec = getGuessSeconds(activeRound.revealLineIds.length);
+      if (preserveGuessTimer) {
+        setTimerSoundsDucked(false);
+        setRoundState((prev) => (prev === "timer_finished" ? "timer_finished" : "paused_for_guess"));
+        return;
+      }
+      setRoundState("paused_for_guess");
+      setTimerSeconds(guessSec);
+      startGuessCountdown(guessSec);
+    };
 
     const monitor = () => {
       const time = player.getCurrentTime();
       const targetLines = visibleHintCountAtTime(time, activeRound, hintLineCount);
       setVisibleHintLineCount((prev) => Math.max(prev, targetLines));
 
-      const stopAt = fragmentStopTimeSec(activeRound.end);
       if (time >= stopAt) {
-        setVisibleHintLineCount(hintLineCount);
-        player.pause();
-        player.seekTo(stopAt);
-        pausedAtRef.current = stopAt;
-        const guessSec = getGuessSeconds(activeRound.revealLineIds.length);
-        if (preserveGuessTimer) {
-          setTimerSoundsDucked(false);
-          setRoundState((prev) => (prev === "timer_finished" ? "timer_finished" : "paused_for_guess"));
-          return;
-        }
-        setRoundState("paused_for_guess");
-        setTimerSeconds(guessSec);
-        startGuessCountdown(guessSec);
+        doFragmentStop();
         return;
       }
 
@@ -352,6 +341,17 @@ export function useQuizGame() {
     };
 
     rafRef.current = requestAnimationFrame(monitor);
+
+    // Резервный таймер: если RAF заблокирован (фоновая вкладка, перегруженный Android),
+    // через 300ms после ожидаемой остановки принудительно глушим аудио.
+    const msUntilStop = Math.max(0, (stopAt - player.getCurrentTime()) * 1000);
+    backupStopTimerRef.current = window.setTimeout(() => {
+      backupStopTimerRef.current = null;
+      // rafRef !== null означает, что RAF ещё не успел вызвать doFragmentStop
+      if (rafRef.current !== null && roundStateRef.current === "playing") {
+        doFragmentStop();
+      }
+    }, msUntilStop + 300);
   };
 
   const startPlaybackMonitor = (preserveGuessTimer = false) => {
@@ -374,33 +374,9 @@ export function useQuizGame() {
     setVisibleHintLineCount(0);
     setRoundState("playing");
     if (gameModeRef.current === "quiz") {
-      const v = getQuizUiVariant(r);
-      setQuizUiVariant(v);
-      if (v === "mc4") {
-        const built = buildQuizMcOptions(r, quizDistractorPoolRef.current, quizPriorCorrectAnswersRef.current);
-        quizCorrectIndexRef.current = built.correctIndex;
-        setQuizCorrectIndex(built.correctIndex);
-        setQuizOptions(built.options);
-        setSelectedQuizIndex(null);
-        setQuizOrderUserIds([]);
-      } else if (v === "order") {
-        quizCorrectIndexRef.current = 0;
-        setQuizCorrectIndex(0);
-        setQuizOptions([]);
-        setSelectedQuizIndex(null);
-        setQuizOrderUserIds(shuffleUntilOrderDiffers(r.revealLineIds));
-      } else {
-        setQuizOptions([]);
-        setSelectedQuizIndex(null);
-        setQuizOrderUserIds([]);
-        setQuizCorrectIndex(0);
-      }
+      setupRoundQuizUi(r);
     } else {
-      setQuizUiVariant(null);
-      setQuizOptions([]);
-      setSelectedQuizIndex(null);
-      setQuizOrderUserIds([]);
-      setQuizCorrectIndex(0);
+      clearRoundForFreestyle();
     }
 
     const player = ensurePlayer();
@@ -479,6 +455,9 @@ export function useQuizGame() {
       detach();
       if (timeoutId !== null) window.clearTimeout(timeoutId);
     };
+    // loadRoundAtIndex намеренно исключён: функция создаётся заново каждый рендер,
+    // добавление её в deps вызвало бы петлю. Актуальная версия захватывается через ref.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previewRound, orderedRounds.length]);
 
   useEffect(() => {
@@ -486,6 +465,7 @@ export function useQuizGame() {
       stopPlaybackTimersAndFade();
       playerRef.current?.destroy?.();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const startQuiz = () => {
@@ -589,7 +569,7 @@ export function useQuizGame() {
     setVisibleHintLineCount(0);
     stopCountdown();
     if (gameModeRef.current === "quiz" && quizUiVariantRef.current === "mc4") {
-      setSelectedQuizIndex(null);
+      setQuizSelectionDirect(null);
     }
     setRoundState("playing");
     startPlaybackMonitor();
@@ -808,33 +788,24 @@ export function useQuizGame() {
     return OUTRO_VIDEO_PATH;
   }, [gameMode, quizScore]);
 
-  const quizEligibleCount = useMemo(
-    () => buildQuizEligiblePool(visibleRoundsForSession()).length,
-    [],
-  );
+  const quizEligibleCount = useMemo(() => buildQuizEligiblePool(visibleRoundsForSession()).length, []);
 
   const setQuizSelection = (index: number | null) => {
     if (gameModeRef.current !== "quiz") return;
     if (roundStateRef.current !== "paused_for_guess") return;
-    setSelectedQuizIndex(index);
+    setQuizSelectionDirect(index);
   };
 
   const reorderQuizOrderLines = useCallback((ids: number[]) => {
     if (gameModeRef.current !== "quiz") return;
     if (roundStateRef.current !== "paused_for_guess") return;
-    setQuizOrderUserIds(ids);
+    reorderQuizOrderLinesDirect(ids);
   }, []);
 
   return {
     roundState,
     roundIndex,
     timerSeconds,
-    showRestartConfirm,
-    setShowRestartConfirm,
-    showExitConfirm,
-    setShowExitConfirm,
-    showRulesOverlay,
-    setShowRulesOverlay,
     isStartCinematic,
     upcomingRoundTitle,
     visibleHintLineCount,
@@ -848,31 +819,43 @@ export function useQuizGame() {
     roundYoutubeBackgroundEmbed,
     hintLines,
     revealLines,
+    previewMode: !!previewRound,
+    previewLoading,
+    gameMode,
+    outroVideoSrc,
     startQuiz,
     skipIntroAndGoToRules,
     onIntroVideoEnded,
     skipRulesAndStart,
+    skipGameRulesToModeSelect,
+    selectGameMode,
     toggleGamePause,
     replaySnippet,
     handleRevealClick,
     nextRound,
     exitToStartScreen,
     returnToModeSelect,
-    previewMode: !!previewRound,
-    previewLoading,
-    gameMode,
-    quizScore,
-    quizOptions,
-    quizUiVariant,
-    quizOrderUserIds,
-    reorderQuizOrderLines,
-    quizCorrectIndex,
-    selectedQuizIndex,
-    setQuizSelection,
-    confirmQuizRound,
-    selectGameMode,
-    quizEligibleCount,
-    outroVideoSrc,
-    skipGameRulesToModeSelect,
+    /** Состояние и действия для режима «Викторина». В freestyle-режиме поля quiz.* не используются. */
+    quiz: {
+      score: quizScore,
+      options: quizOptions,
+      uiVariant: quizUiVariant,
+      orderUserIds: quizOrderUserIds,
+      selectedIndex: selectedQuizIndex,
+      correctIndex: quizCorrectIndex,
+      eligibleCount: quizEligibleCount,
+      setSelection: setQuizSelection,
+      reorderLines: reorderQuizOrderLines,
+      confirm: confirmQuizRound,
+    },
+    /** Видимость диалоговых оверлеев (пауза, правила, подтверждения). */
+    overlay: {
+      showRestartConfirm,
+      setShowRestartConfirm,
+      showExitConfirm,
+      setShowExitConfirm,
+      showRulesOverlay,
+      setShowRulesOverlay,
+    },
   };
 }

@@ -112,5 +112,7 @@ export function useQuizKeyboardShortcuts(options: {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+    // *Ref-переменные намеренно исключены из deps: они стабильны и меняются только через .current.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isQuizMainView, showRestartConfirm, showExitConfirm, showRulesOverlay, setShowRulesOverlay]);
 }

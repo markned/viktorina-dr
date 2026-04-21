@@ -1,0 +1,129 @@
+/* ——— Планшеты и телефоны ——— */
+@media (max-width: 900px) {
+  .app-overlay {
+    padding-bottom: calc(100px + var(--safe-bottom));
+  }
+
+  .quiz-content {
+    justify-content: flex-start;
+    padding-top: 2px;
+  }
+
+  .lyrics-panel.genius-style,
+  .reveal-panel.genius-style,
+  .quiz-options-panel.genius-style {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-overlay {
+    padding-top: calc(6px + var(--safe-top));
+    padding-left: calc(10px + var(--safe-left));
+    padding-right: calc(10px + var(--safe-right));
+    padding-bottom: calc(118px + var(--safe-bottom));
+  }
+
+  .quiz-header-timer {
+    justify-content: stretch;
+  }
+
+  .timer-wrap {
+    width: 100%;
+  }
+
+  .timer-mobile-bar {
+    display: flex;
+  }
+
+  .timer-desktop-ring {
+    display: none;
+  }
+
+  .timer-corner {
+    width: 56px;
+    height: 56px;
+  }
+
+  .timer-value {
+    font-size: 1.1rem;
+  }
+
+  .quiz-round-counter {
+    font-size: 0.85rem;
+  }
+
+  .lyric-line.genius-bar {
+    padding: 10px 14px;
+  }
+
+  .rules-screen-shell,
+  .rules-overlay-root {
+    padding: max(6px, var(--safe-top)) max(10px, var(--safe-right)) max(6px, var(--safe-bottom))
+      max(10px, var(--safe-left));
+  }
+
+  .outro-actions {
+    bottom: max(20px, var(--safe-bottom));
+    gap: 10px;
+  }
+
+  .outro-menu-btn {
+    width: 64px;
+    height: 64px;
+    font-size: 1.45rem;
+  }
+
+  .outro-restart-btn {
+    width: 64px;
+    height: 64px;
+    font-size: 1.75rem;
+  }
+
+  .start-icon {
+    max-width: min(240px, 72vw);
+  }
+}
+
+@media (max-width: 380px) {
+  .timer-mobile-value {
+    font-size: 1rem;
+  }
+
+  .timer-corner {
+    width: 50px;
+    height: 50px;
+  }
+
+  .quiz-title {
+    font-size: clamp(1.1rem, 5vw, 1.6rem);
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .app-overlay {
+    max-width: min(900px, 100%);
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-height: 520px) {
+  .rules-screen-title {
+    font-size: 1.08rem;
+    margin-bottom: 6px;
+  }
+
+  .rules-screen-card {
+    padding: 10px 12px;
+  }
+
+  .quiz-title {
+    font-size: clamp(1rem, 4vmin, 1.35rem);
+  }
+
+  .lyric-line.genius-bar {
+    padding: 6px 10px;
+    font-size: clamp(0.75rem, 3.5vmin, 1rem);
+  }
+}

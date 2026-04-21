@@ -1,0 +1,176 @@
+/* Общая громкость — только ПК: видна иконка; при hover выезжает ползунок */
+.master-volume-dock {
+  display: none;
+}
+
+@media (min-width: 901px) {
+  .master-volume-dock {
+    --mv-icon: 48px;
+    --mv-track-active: #6eb0f5;
+    --mv-track-idle: #2c3038;
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 50%;
+    z-index: 60;
+    transform: translateY(-50%);
+    padding-left: max(0px, var(--safe-left));
+    pointer-events: none;
+  }
+
+  .master-volume-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    pointer-events: auto;
+    width: max-content;
+    transition: transform 0.28s cubic-bezier(0.33, 1, 0.68, 1);
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.4));
+    /* Спрятана панель с ползунком, видна только кнопка-иконка у левого края */
+    transform: translateX(calc(-100% + var(--mv-icon)));
+  }
+
+  .master-volume-dock:hover .master-volume-inner,
+  .master-volume-dock:focus-within .master-volume-inner {
+    transform: translateX(0);
+  }
+
+  .master-volume-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 12px 14px 16px;
+    min-width: 4.5rem;
+    min-height: min(168px, 30vh);
+    background: rgba(12, 16, 28, 0.55);
+    border: 1px solid rgba(158, 180, 227, 0.22);
+    border-right: none;
+    border-radius: 14px 0 0 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .master-volume-icon-btn {
+    box-sizing: border-box;
+    flex: 0 0 var(--mv-icon);
+    width: var(--mv-icon);
+    min-height: min(168px, 30vh);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(158, 180, 227, 0.28);
+    border-radius: 0 14px 14px 0;
+    background: rgba(18, 22, 36, 0.72);
+    color: #f0f4ff;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.2;
+    transition:
+      opacity 0.45s ease,
+      background 0.22s ease,
+      border-color 0.22s ease;
+  }
+
+  .master-volume-dock:hover .master-volume-icon-btn,
+  .master-volume-dock:focus-within .master-volume-icon-btn {
+    opacity: 1;
+  }
+
+  .master-volume-dock:hover .master-volume-icon-btn:hover,
+  .master-volume-dock:focus-within .master-volume-icon-btn:hover {
+    background: rgba(26, 32, 52, 0.85);
+  }
+
+  .master-volume-icon-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .master-volume-icon-btn svg {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+  }
+
+  .master-volume-slider {
+    --mv-fill-pct: 70%;
+    width: 32px;
+    height: min(142px, 28vh);
+    margin: 0;
+    cursor: pointer;
+    background: transparent;
+    accent-color: #ffffff;
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
+  }
+
+  .master-volume-slider::-webkit-slider-runnable-track {
+    width: 7px;
+    height: 100%;
+    margin: 0;
+    border-radius: 999px;
+    background: linear-gradient(
+      to top,
+      var(--mv-track-active) 0%,
+      var(--mv-track-active) var(--mv-fill-pct),
+      var(--mv-track-idle) var(--mv-fill-pct),
+      var(--mv-track-idle) 100%
+    );
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  }
+
+  .master-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 26px;
+    margin-left: -5px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    border: none;
+  }
+
+  .master-volume-slider::-moz-range-track {
+    width: 7px;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(
+      to top,
+      var(--mv-track-active) 0%,
+      var(--mv-track-active) var(--mv-fill-pct),
+      var(--mv-track-idle) var(--mv-fill-pct),
+      var(--mv-track-idle) 100%
+    );
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  }
+
+  .master-volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 26px;
+    border: none;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  }
+
+  @supports not (appearance: slider-vertical) {
+    .master-volume-slider {
+      width: min(142px, 28vh);
+      height: 32px;
+      transform: rotate(-90deg);
+      transform-origin: center center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .master-volume-icon-btn {
+      transition: none;
+    }
+  }
+}

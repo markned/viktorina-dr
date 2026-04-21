@@ -20,7 +20,16 @@ function volumeLevel(value: number): VolumeIconLevel {
 
 function VolumeGlyph({ level }: { level: VolumeIconLevel }) {
   const stroke = "currentColor";
-  const common = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke, strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke,
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
   if (level === "mute") {
     return (
       <svg {...common} aria-hidden>

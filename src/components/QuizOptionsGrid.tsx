@@ -29,8 +29,7 @@ export function QuizOptionsGrid({
   disabled,
 }: QuizOptionsGridProps) {
   const isFeedback = roundState === "quiz_feedback";
-  const visible =
-    (roundState === "paused_for_guess" || isFeedback) && options.length === 4;
+  const visible = (roundState === "paused_for_guess" || isFeedback) && options.length === 4;
   if (!visible) return null;
 
   return (

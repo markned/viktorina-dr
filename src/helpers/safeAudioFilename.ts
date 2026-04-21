@@ -52,7 +52,10 @@ function fnv1aHex(s: string): string {
 }
 
 function parseStemExt(name: string): { stem: string; ext: string } {
-  const t = name.trim().replace(/^.*[/\\]/, "").replace(/\.\./g, "");
+  const t = name
+    .trim()
+    .replace(/^.*[/\\]/, "")
+    .replace(/\.\./g, "");
   const last = t.lastIndexOf(".");
   if (last <= 0) {
     return { stem: t || "track", ext: ".m4a" };

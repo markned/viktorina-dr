@@ -18,10 +18,7 @@ export function extractYouTubeVideoId(inputUrl: string): string | null {
     const url = new URL(inputUrl);
     const host = url.hostname.toLowerCase();
     const isShortHost = host === "youtu.be";
-    const isYt =
-      isShortHost ||
-      host.endsWith("youtube.com") ||
-      host.endsWith("youtube-nocookie.com");
+    const isYt = isShortHost || host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com");
 
     if (!isYt) {
       return null;

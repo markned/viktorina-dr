@@ -24,12 +24,7 @@ export function IntroScreen({ onVideoEnded, onSkip }: IntroScreenProps) {
         onPlay={onPlay}
         onEnded={onVideoEnded}
       />
-      <button
-        type="button"
-        className="intro-skip-btn"
-        onClick={onSkip}
-        aria-label="Пропустить интро"
-      >
+      <button type="button" className="intro-skip-btn" onClick={onSkip} aria-label="Пропустить интро">
         <svg
           className="intro-skip-btn-icon"
           width="28"

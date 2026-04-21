@@ -34,13 +34,7 @@ export function QuizOrderLines({
 
   return (
     <section className="quiz-options-panel genius-style quiz-order-panel" aria-label="Порядок строк ответа">
-      <Reorder.Group
-        axis="y"
-        as="ol"
-        className="quiz-order-list"
-        values={orderedIds}
-        onReorder={onReorder}
-      >
+      <Reorder.Group axis="y" as="ol" className="quiz-order-list" values={orderedIds} onReorder={onReorder}>
         {orderedIds.map((id, idx) => {
           const ok = isFeedback && correctIds[idx] === id;
           const rowCls =

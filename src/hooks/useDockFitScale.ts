@@ -38,5 +38,7 @@ export function useDockFitScale(dockRef: RefObject<HTMLElement | null>) {
       vp?.removeEventListener("scroll", compute);
       window.removeEventListener("orientationchange", compute);
     };
+    // dockRef — стабильный ref-объект, его идентичность не меняется между рендерами.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

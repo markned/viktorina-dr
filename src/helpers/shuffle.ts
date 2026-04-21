@@ -1,5 +1,5 @@
 /** Fisher–Yates shuffle (копия массива). */
-export const shuffle = <T,>(items: T[]): T[] => {
+export const shuffle = <T>(items: T[]): T[] => {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -17,11 +17,7 @@ export function shuffleUntilOrderDiffers<T>(original: readonly T[], maxTries = 4
   if (items.length <= 1) return items;
   let shuffled = shuffle(items);
   let tries = 0;
-  while (
-    tries < maxTries &&
-    items.length === shuffled.length &&
-    items.every((id, i) => id === shuffled[i])
-  ) {
+  while (tries < maxTries && items.length === shuffled.length && items.every((id, i) => id === shuffled[i])) {
     shuffled = shuffle([...items]);
     tries += 1;
   }

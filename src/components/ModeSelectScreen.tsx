@@ -105,8 +105,7 @@ export function ModeSelectScreen({ onSelectMode, quizEligibleCount }: ModeSelect
   const quizDisabled = quizEligibleCount < 4;
   const demo = useModeSelectMobileDemo(quizDisabled);
 
-  const shellClass =
-    "mode-select-shell" + (demo.isMobileDemo ? " mode-select-shell--mobile-demo" : "");
+  const shellClass = "mode-select-shell" + (demo.isMobileDemo ? " mode-select-shell--mobile-demo" : "");
 
   return (
     <main className={shellClass}>
