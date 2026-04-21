@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import type { QuizUiVariant } from "../helpers/quizOptions";
 import type { GameMode, LyricLine, Round, RoundState } from "../types";
 import { useQuizContentFit } from "../hooks/useQuizContentFit";
@@ -37,7 +37,7 @@ type QuizScreenProps = {
   onNextRound: () => void;
 };
 
-export function QuizScreen(props: QuizScreenProps) {
+export const QuizScreen = memo(function QuizScreen(props: QuizScreenProps) {
   const {
     round,
     roundIndex,
@@ -68,7 +68,10 @@ export function QuizScreen(props: QuizScreenProps) {
   const timerActive = roundState === "paused_for_guess";
   const showLyrics = roundState !== "transition";
   const counterLabel = roundCounterEasterEggLabel(round) ?? `${roundIndex + 1}/${totalRounds}`;
-  const lineText = (id: number) => round.lyrics.find((l) => l.id === id)?.text ?? "";
+  const lineText = useCallback(
+    (id: number) => round.lyrics.find((l) => l.id === id)?.text ?? "",
+    [round.lyrics],
+  );
   const quizHintVisible =
     gameMode === "quiz" &&
     quizUiVariant === "order" &&
@@ -145,4 +148,4 @@ export function QuizScreen(props: QuizScreenProps) {
       />
     </div>
   );
-}
+});

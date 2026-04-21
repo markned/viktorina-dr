@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { LyricLine } from "../types";
 
@@ -6,7 +7,7 @@ type RevealPanelProps = {
   visible: boolean;
 };
 
-export function RevealPanel({ revealLines, visible }: RevealPanelProps) {
+export const RevealPanel = memo(function RevealPanel({ revealLines, visible }: RevealPanelProps) {
   return (
     <AnimatePresence>
       {visible ? (
@@ -28,4 +29,4 @@ export function RevealPanel({ revealLines, visible }: RevealPanelProps) {
       ) : null}
     </AnimatePresence>
   );
-}
+});

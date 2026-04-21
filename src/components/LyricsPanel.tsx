@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import type { LyricLine } from "../types";
 
@@ -6,7 +7,7 @@ type LyricsPanelProps = {
   visibleCount: number;
 };
 
-export function LyricsPanel({ hintLines, visibleCount }: LyricsPanelProps) {
+export const LyricsPanel = memo(function LyricsPanel({ hintLines, visibleCount }: LyricsPanelProps) {
   const visibleLines = hintLines.slice(0, visibleCount);
 
   return (
@@ -26,4 +27,4 @@ export function LyricsPanel({ hintLines, visibleCount }: LyricsPanelProps) {
       </div>
     </section>
   );
-}
+});

@@ -722,6 +722,13 @@ export function useQuizGame() {
   handleRevealClickRef.current = handleRevealClick;
   confirmQuizRoundRef.current = confirmQuizRound;
 
+  // Стабильные обёртки: ссылка не меняется между рендерами, поэтому React.memo
+  // на children работает даже при тиках таймера (setTimerSeconds каждые 100ms).
+  const stableReplaySnippet = useCallback(() => replaySnippetRef.current(), []);
+  const stableNextRound = useCallback(() => nextRoundRef.current(), []);
+  const stableHandleRevealClick = useCallback(() => handleRevealClickRef.current(), []);
+  const stableConfirmQuizRound = useCallback(() => confirmQuizRoundRef.current(), []);
+
   useQuizKeyboardShortcuts({
     isQuizMainView,
     showRestartConfirm,
@@ -790,17 +797,23 @@ export function useQuizGame() {
 
   const quizEligibleCount = useMemo(() => buildQuizEligiblePool(visibleRoundsForSession()).length, []);
 
-  const setQuizSelection = (index: number | null) => {
-    if (gameModeRef.current !== "quiz") return;
-    if (roundStateRef.current !== "paused_for_guess") return;
-    setQuizSelectionDirect(index);
-  };
+  const setQuizSelection = useCallback(
+    (index: number | null) => {
+      if (gameModeRef.current !== "quiz") return;
+      if (roundStateRef.current !== "paused_for_guess") return;
+      setQuizSelectionDirect(index);
+    },
+    [setQuizSelectionDirect],
+  );
 
-  const reorderQuizOrderLines = useCallback((ids: number[]) => {
-    if (gameModeRef.current !== "quiz") return;
-    if (roundStateRef.current !== "paused_for_guess") return;
-    reorderQuizOrderLinesDirect(ids);
-  }, []);
+  const reorderQuizOrderLines = useCallback(
+    (ids: number[]) => {
+      if (gameModeRef.current !== "quiz") return;
+      if (roundStateRef.current !== "paused_for_guess") return;
+      reorderQuizOrderLinesDirect(ids);
+    },
+    [reorderQuizOrderLinesDirect],
+  );
 
   return {
     roundState,
@@ -830,9 +843,9 @@ export function useQuizGame() {
     skipGameRulesToModeSelect,
     selectGameMode,
     toggleGamePause,
-    replaySnippet,
-    handleRevealClick,
-    nextRound,
+    replaySnippet: stableReplaySnippet,
+    handleRevealClick: stableHandleRevealClick,
+    nextRound: stableNextRound,
     exitToStartScreen,
     returnToModeSelect,
     /** Состояние и действия для режима «Викторина». В freestyle-режиме поля quiz.* не используются. */
@@ -846,7 +859,7 @@ export function useQuizGame() {
       eligibleCount: quizEligibleCount,
       setSelection: setQuizSelection,
       reorderLines: reorderQuizOrderLines,
-      confirm: confirmQuizRound,
+      confirm: stableConfirmQuizRound,
     },
     /** Видимость диалоговых оверлеев (пауза, правила, подтверждения). */
     overlay: {

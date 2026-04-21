@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Reorder } from "framer-motion";
 import type { RoundState } from "../types";
 
@@ -10,7 +11,7 @@ type QuizOrderLinesProps = {
   onReorder: (ids: number[]) => void;
 };
 
-export function QuizOrderLines({
+export const QuizOrderLines = memo(function QuizOrderLines({
   roundState,
   orderedIds,
   lineText,
@@ -89,4 +90,4 @@ export function QuizOrderLines({
       </Reorder.Group>
     </section>
   );
-}
+});

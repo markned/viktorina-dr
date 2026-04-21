@@ -1,3 +1,5 @@
+import { memo, useMemo } from "react";
+
 type TimerProps = {
   seconds: number;
   isActive: boolean;
@@ -16,11 +18,12 @@ function timerAccentColor(seconds: number, totalSeconds: number): string {
   return `rgb(${r},${g},${b})`;
 }
 
-export function Timer({ seconds, isActive, totalSeconds }: TimerProps) {
+const CIRCUMFERENCE = 2 * Math.PI * 45;
+
+export const Timer = memo(function Timer({ seconds, isActive, totalSeconds }: TimerProps) {
   const progress = totalSeconds > 0 ? 1 - seconds / totalSeconds : 0;
-  const circumference = 2 * Math.PI * 45;
-  const strokeDashoffset = circumference * (1 - progress);
-  const accent = timerAccentColor(seconds, totalSeconds);
+  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+  const accent = useMemo(() => timerAccentColor(seconds, totalSeconds), [seconds, totalSeconds]);
 
   return (
     <div className={`timer-wrap ${isActive ? "timer-wrap-active" : ""}`} aria-label="Таймер">
@@ -49,7 +52,7 @@ export function Timer({ seconds, isActive, totalSeconds }: TimerProps) {
               r="45"
               fill="none"
               strokeWidth="6"
-              strokeDasharray={circumference}
+              strokeDasharray={CIRCUMFERENCE}
               strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
               transform="rotate(-90 50 50)"
@@ -63,4 +66,4 @@ export function Timer({ seconds, isActive, totalSeconds }: TimerProps) {
       </div>
     </div>
   );
-}
+});

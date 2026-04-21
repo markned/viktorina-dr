@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { memo, useMemo, useRef } from "react";
 import { ReplayWithPlayIcon } from "./ReplayWithPlayIcon";
 import { useCoarsePointer } from "../hooks/useCoarsePointer";
 import { useDockFitScale } from "../hooks/useDockFitScale";
@@ -40,7 +40,7 @@ type ControlsProps = {
   onNextRound: () => void;
 };
 
-export function Controls({
+export const Controls = memo(function Controls({
   roundState,
   gameMode,
   quizUiVariant,
@@ -112,4 +112,4 @@ export function Controls({
       </nav>
     </div>
   );
-}
+});

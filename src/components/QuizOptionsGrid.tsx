@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { RoundState } from "../types";
 
 function optionLabel(text: string) {
@@ -6,7 +7,7 @@ function optionLabel(text: string) {
   if (parts.length === 1) return raw;
   return parts.map((part, j) => (
     <span key={j} className="quiz-option-segment">
-      {part.length ? part : "\u00A0"}
+      {part.length ? part : " "}
     </span>
   ));
 }
@@ -20,7 +21,7 @@ type QuizOptionsGridProps = {
   disabled: boolean;
 };
 
-export function QuizOptionsGrid({
+export const QuizOptionsGrid = memo(function QuizOptionsGrid({
   options,
   selectedIndex,
   correctIndex,
@@ -66,4 +67,4 @@ export function QuizOptionsGrid({
       </div>
     </section>
   );
-}
+});
